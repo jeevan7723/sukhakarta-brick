@@ -1,0 +1,1783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kiln Production Admin Dashboard | Sukhakarta Bricks</title>
+  <meta name="description" content="Daily brick manufacturing and worker production tracking dashboard for Sukhakarta Bricks.">
+
+  <!-- Google Fonts (English + Devanagari / Marathi support) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700;800&family=Outfit:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="admin.css?v=60">
+  <!-- html2pdf.js for client-side PDF document generation (local bundle + CDN fallback) -->
+  <script src="assets/html2pdf.bundle.min.js?v=4.0"></script>
+  <script>if (typeof html2pdf === 'undefined') document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"><\/script>');</script>
+</head>
+<body>
+
+  <!-- ==========================================
+       ADMIN SECURE LOGIN VIEW
+       ========================================== -->
+  <div id="admin-login-view" class="admin-login-overlay">
+    <div class="login-card">
+      <!-- Language Switcher in Login Card -->
+      <div style="display: flex; justify-content: flex-end; margin-bottom: 8px;">
+        <div class="lang-toggle-group" role="group" aria-label="Language Selector">
+          <button type="button" class="lang-btn active" data-lang="en">EN</button>
+          <button type="button" class="lang-btn" data-lang="mr">मराठी</button>
+        </div>
+      </div>
+
+      <div class="login-badge-icon">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+        </svg>
+      </div>
+      <h2 class="login-title" data-i18n="admin_login_title">Kiln Admin Portal</h2>
+      <p class="login-subtitle" data-i18n="admin_login_subtitle">Sukhakarta Bricks Production Management</p>
+
+      <div id="login-error" class="login-error-msg">
+        Invalid password. Please enter the correct kiln admin password.
+      </div>
+
+      <form id="admin-login-form">
+        <div class="form-group-admin" style="text-align: left;">
+          <label for="admin-user-input" class="form-label-admin" data-i18n="admin_login_user">Username</label>
+          <input type="text" id="admin-user-input" class="form-control-admin" value="admin" required autocomplete="username">
+        </div>
+
+        <div class="form-group-admin" style="text-align: left;">
+          <label for="admin-password-input" class="form-label-admin" data-i18n="admin_login_pwd">Password</label>
+          <div class="password-input-wrap">
+            <input type="password" id="admin-password-input" class="form-control-admin" placeholder="Enter admin password" required autocomplete="current-password" autofocus>
+            <button type="button" class="btn-toggle-pwd" id="btn-toggle-password" title="Show/Hide Password">
+              <svg id="eye-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+            </button>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-size: 0.8rem; color: var(--color-text-dim);">
+          <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+            <input type="checkbox" id="remember-me-checkbox" checked>
+            <span data-i18n="admin_login_remember">Remember on this device</span>
+          </label>
+        </div>
+
+        <button type="submit" class="btn-admin btn-terracotta" style="width: 100%; justify-content: center; padding: 12px; font-size: 0.95rem;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+          <span data-i18n="admin_login_btn">Secure Sign In</span>
+        </button>
+
+        <div style="margin-top: 18px;">
+          <a href="index.html" style="font-size: 0.8rem; color: var(--color-text-dim); text-decoration: underline;"><span data-i18n="admin_login_back">← Return to Main Website</span></a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       PROTECTED ADMIN DASHBOARD VIEW
+       ========================================== -->
+  <div id="admin-dashboard-view" class="admin-app-layout hidden">
+
+    <!-- Mobile Sidebar Backdrop Overlay -->
+    <div id="sidebar-backdrop" class="sidebar-backdrop" onclick="toggleSidebar()"></div>
+
+    <!-- Admin Left Sidebar -->
+    <aside id="admin-sidebar" class="admin-sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-brand">
+          <div class="sidebar-brand-badge">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <rect x="2" y="4" width="20" height="7" rx="1"></rect>
+              <rect x="2" y="13" width="9" height="7" rx="1"></rect>
+              <rect x="13" y="13" width="9" height="7" rx="1"></rect>
+            </svg>
+          </div>
+          <div class="sidebar-brand-text">
+            <h2>SUKHAKARTA <span>BRICKS</span></h2>
+            <p data-i18n="admin_nav_title">Kiln Production Portal</p>
+          </div>
+        </div>
+        <button type="button" class="sidebar-close-btn" onclick="toggleSidebar()" aria-label="Close Sidebar">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+
+      <!-- Kiln Manager Profile Card -->
+      <div class="sidebar-profile-card">
+        <div class="sidebar-avatar">
+          <span>KM</span>
+          <span class="user-status-dot" title="Active"></span>
+        </div>
+        <div class="sidebar-profile-info">
+          <strong data-i18n="admin_sidebar_user_role">Kiln Manager (Admin)</strong>
+          <span class="profile-status-text"><span class="pulse-dot"></span> <span data-i18n="admin_sidebar_status_online">Online</span></span>
+        </div>
+      </div>
+
+      <!-- Sidebar Navigation Menu -->
+      <nav class="sidebar-nav">
+        <div class="sidebar-section-heading" data-i18n="admin_sidebar_main_nav">MAIN NAVIGATION</div>
+
+        <a href="#overview" id="nav-item-overview" class="sidebar-nav-item active" onclick="switchAdminPage('overview', event)">
+          <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg>
+          <span data-i18n="admin_sidebar_overview">Overview & KPIs</span>
+        </a>
+
+        <a href="#record" id="nav-item-record" class="sidebar-nav-item" onclick="switchAdminPage('record', event)">
+          <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+          <span data-i18n="admin_sidebar_record">Record Production</span>
+        </a>
+
+        <a href="#chart" id="nav-item-chart" class="sidebar-nav-item" onclick="switchAdminPage('chart', event)">
+          <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+          <span data-i18n="admin_sidebar_chart">Production Analytics</span>
+        </a>
+
+        <a href="#workers" id="nav-item-workers" class="sidebar-nav-item" onclick="switchAdminPage('workers', event)">
+          <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+          <span data-i18n="admin_sidebar_workers">Workers Directory</span>
+        </a>
+
+        <a href="#logs" id="nav-item-logs" class="sidebar-nav-item" onclick="switchAdminPage('logs', event)">
+          <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+          <span data-i18n="admin_sidebar_logs">Daily Work Logs</span>
+        </a>
+
+        <a href="#raw-travelers" id="nav-item-raw-travelers" class="sidebar-nav-item" onclick="switchAdminPage('raw-travelers', event)">
+          <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17h18"></path><path d="M19 17v-4a2 2 0 0 0-2-2h-3l-2-4H7a2 2 0 0 0-2 2v8"></path><circle cx="7.5" cy="17.5" r="2.5"></circle><circle cx="16.5" cy="17.5" r="2.5"></circle></svg>
+          <span data-i18n="admin_nav_raw_travelers">Raw Brick Travelers (कच्ची विट वाहतूक)</span>
+          <span id="badge-raw-travelers-today" class="badge-count" style="display: none; margin-left: auto; background: rgba(234, 88, 12, 0.2); color: #FB923C; border: 1px solid rgba(234, 88, 12, 0.4); font-size: 0.7rem; font-weight: 800; padding: 2px 7px; border-radius: 10px;">0</span>
+        </a>
+
+        <a href="#deliveries" id="nav-item-deliveries" class="sidebar-nav-item" onclick="switchAdminPage('deliveries', event)">
+          <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
+          <span data-i18n="admin_sidebar_deliveries">Brick Deliveries & Transport</span>
+        </a>
+
+        <a href="#raw-materials" id="nav-item-raw-materials" class="sidebar-nav-item" onclick="switchAdminPage('raw-materials', event)">
+          <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+          <span data-i18n="admin_nav_raw_materials">Soil & Coal Inward (कच्चा माल)</span>
+        </a>
+
+        <a href="#inquiries" id="nav-item-inquiries" class="sidebar-nav-item" onclick="switchAdminPage('inquiries', event)">
+          <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+          <span data-i18n="admin_sidebar_inquiries">Website Inquiries</span>
+          <span id="badge-inquiries-count" class="badge-count" style="display: none; margin-left: auto; background: var(--color-terracotta); color: #fff; font-size: 0.7rem; font-weight: 800; padding: 2px 7px; border-radius: 10px;">0</span>
+        </a>
+
+        <a href="#website-data" id="nav-item-website-data" class="sidebar-nav-item" onclick="switchAdminPage('website-data', event)">
+          <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+          <span data-i18n="admin_sidebar_web_data">Website Live Settings</span>
+        </a>
+
+        <a href="#all" id="nav-item-all" class="sidebar-nav-item" onclick="switchAdminPage('all', event)">
+          <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+          <span data-i18n="admin_sidebar_all">All Sections View</span>
+        </a>
+
+        <div class="sidebar-section-heading" data-i18n="admin_sidebar_quick_actions">QUICK ACTIONS</div>
+
+        <button type="button" class="sidebar-action-btn" onclick="openWorkerModal(); closeSidebarMobile();">
+          <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><line x1="19" y1="8" x2="19" y2="14"></line><line x1="22" y1="11" x2="16" y2="11"></line></svg>
+          <span data-i18n="admin_sidebar_add_worker">+ Add New Worker</span>
+        </button>
+
+        <button type="button" class="sidebar-action-btn" onclick="openRawTravelerWorkerModal(); closeSidebarMobile();">
+          <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+          <span data-i18n="admin_raw_travelers_btn_add_worker">+ Add Traveler Worker</span>
+        </button>
+
+        <button type="button" class="sidebar-action-btn" onclick="openLeaveModal(); closeSidebarMobile();">
+          <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+          <span data-i18n="admin_sidebar_mark_leave">+ Mark Leave</span>
+        </button>
+
+        <button type="button" class="sidebar-action-btn btn-wa-sidebar" onclick="shareDailyReportWhatsApp(); closeSidebarMobile();">
+          <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2M12.05 3.67C14.25 3.67 16.31 4.53 17.87 6.09C19.42 7.65 20.28 9.72 20.28 11.92C20.28 16.46 16.58 20.15 12.04 20.15C10.56 20.15 9.11 19.76 7.85 19L7.55 18.83L4.43 19.65L5.26 16.61L5.06 16.29C4.24 14.99 3.8 13.47 3.8 11.91C3.81 7.37 7.5 3.67 12.05 3.67Z"/></svg>
+          <span data-i18n="admin_sidebar_wa_report">WhatsApp Report</span>
+        </button>
+
+        <button type="button" class="sidebar-action-btn" onclick="exportProductionCSV(); closeSidebarMobile();">
+          <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          <span data-i18n="admin_sidebar_export">Export CSV</span>
+        </button>
+
+        <button type="button" class="sidebar-action-btn" onclick="exportCompleteDataPDF(); closeSidebarMobile();" style="border-color: rgba(239, 68, 68, 0.4); color: #FCA5A5;">
+          <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+          <span data-i18n="admin_sidebar_pdf">Download PDF Report</span>
+        </button>
+      </nav>
+
+      <!-- Sidebar Bottom System Section -->
+      <div class="sidebar-footer">
+        <a href="index.html" class="sidebar-footer-link">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+          <span data-i18n="admin_nav_view_site">View Website</span>
+        </a>
+        <button type="button" class="sidebar-footer-link btn-sidebar-logout" onclick="document.getElementById('btn-admin-logout').click()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+          <span data-i18n="admin_nav_signout">Sign Out</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="admin-main-wrapper">
+
+      <!-- Top Navigation Bar -->
+      <header class="admin-navbar">
+        <div class="navbar-left">
+          <button type="button" class="sidebar-toggle-btn" id="sidebar-toggle-btn" onclick="toggleSidebar()" aria-label="Toggle Sidebar" title="Toggle Sidebar">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+          </button>
+          <div class="brand-section">
+            <div class="brand-logo-badge">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <rect x="2" y="4" width="20" height="7" rx="1"></rect>
+                <rect x="2" y="13" width="9" height="7" rx="1"></rect>
+                <rect x="13" y="13" width="9" height="7" rx="1"></rect>
+              </svg>
+            </div>
+            <div class="brand-info">
+              <h1>SUKHAKARTA <span>BRICKS</span></h1>
+              <p data-i18n="admin_nav_title">Kiln Production & Worker Tracking Portal</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="nav-actions">
+          <!-- Live Cloud DB Status Indicator -->
+          <div id="firestore-sync-badge" class="cloud-sync-badge" title="Live Auto-Sync Active: Google Cloud Firestore (sukhakarta-bricks)" onclick="checkCloudSyncStatus()">
+            <span class="sync-dot"></span>
+            <span class="sync-text" id="sync-status-label" data-i18n="admin_cloud_synced">Live Synced 🟢</span>
+          </div>
+
+          <!-- Quick Cloud Refresh Button -->
+          <button type="button" class="btn-admin btn-outline" style="padding: 7px 12px; font-size: 0.8rem; gap: 6px; border-radius: var(--radius-sm);" onclick="pullAllFromCloud()" title="Download & sync latest data from Cloud Firestore">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+            <span data-i18n="admin_btn_cloud_pull">Cloud Refresh</span>
+          </button>
+
+          <!-- Language Switcher in Navbar -->
+          <div class="lang-toggle-group" role="group" aria-label="Language Selector">
+            <button type="button" class="lang-btn active" data-lang="en">EN</button>
+            <button type="button" class="lang-btn" data-lang="mr">मराठी</button>
+          </div>
+
+          <!-- Date Selector -->
+          <div class="date-selector-wrap">
+            <label for="filter-date" data-i18n="admin_nav_date">Date:</label>
+            <input type="date" id="filter-date" class="admin-date-input">
+          </div>
+
+          <!-- One-Click WhatsApp Daily Report -->
+          <button type="button" class="btn-admin btn-whatsapp-share" onclick="shareDailyReportWhatsApp()" title="Send formatted daily summary to Owner/Manager">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2M12.05 3.67C14.25 3.67 16.31 4.53 17.87 6.09C19.42 7.65 20.28 9.72 20.28 11.92C20.28 16.46 16.58 20.15 12.04 20.15C10.56 20.15 9.11 19.76 7.85 19L7.55 18.83L4.43 19.65L5.26 16.61L5.06 16.29C4.24 14.99 3.8 13.47 3.8 11.91C3.81 7.37 7.5 3.67 12.05 3.67Z"/></svg>
+            <span data-i18n="admin_nav_wa_report">WhatsApp Daily Report</span>
+          </button>
+
+          <!-- Download Full Kiln PDF Report -->
+          <button type="button" class="btn-admin btn-outline btn-pdf-export" onclick="exportCompleteDataPDF()" title="Download complete kiln records as PDF">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+            <span data-i18n="admin_btn_download_pdf">PDF Report</span>
+          </button>
+
+          <!-- Back to Public Site -->
+          <a href="index.html" class="btn-admin btn-outline">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+            <span data-i18n="admin_nav_view_site">View Website</span>
+          </a>
+
+          <!-- Sign Out Button -->
+          <button type="button" class="btn-admin btn-logout" id="btn-admin-logout" title="Sign out of Admin Dashboard">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+            <span data-i18n="admin_nav_signout">Sign Out</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- ==========================================
+           MAIN DASHBOARD CONTAINER
+           ========================================== -->
+      <main class="admin-container">
+
+        <!-- Dynamic Page View Header Banner -->
+        <div class="admin-page-header-bar" id="admin-page-header">
+          <div class="page-header-info">
+            <div class="page-header-badge" id="page-header-badge">📊 MAIN DASHBOARD</div>
+            <h2 class="page-header-title" id="page-header-title" data-i18n="admin_sidebar_overview">Overview & KPIs</h2>
+            <p class="page-header-desc" id="page-header-desc" data-i18n="admin_page_desc_overview">Daily manufacturing indicators, wages, active workforce, and delivery totals</p>
+          </div>
+          <div class="page-header-actions">
+            <div class="page-view-switch-tabs">
+              <button type="button" class="view-tab-btn active" id="btn-mode-page" onclick="switchAdminPage(currentAdminPage === 'all' ? 'overview' : currentAdminPage, event)" title="Open in dedicated page view">
+                📄 <span data-i18n="admin_view_page_mode">Page View</span>
+              </button>
+              <button type="button" class="view-tab-btn" id="btn-mode-all" onclick="switchAdminPage('all', event)" title="View all sections together">
+                📑 <span data-i18n="admin_view_all_mode">All Sections</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- KPI Metric Summary Cards -->
+        <div class="kpi-grid" id="section-kpis">
+          <!-- 1. Total Manufactured Bricks (All-time + Today) -->
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span class="kpi-title" data-i18n="admin_kpi_total_mfg">Total Manufactured</span>
+              <div class="kpi-icon">🧱</div>
+            </div>
+            <div class="kpi-value" id="kpi-lifetime-manufactured">0</div>
+            <div class="kpi-subtitle">
+              <span>📅 Today: </span><strong id="kpi-total-bricks" style="color:#fff;">0</strong>
+              <span class="kpi-trend-up">↑ Net Good</span>
+            </div>
+          </div>
+
+          <!-- Raw Bricks Reached Kiln (All-time + Today) -->
+          <div class="kpi-card" style="--color-terracotta: #EA580C; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;" onclick="switchAdminPage('raw-travelers', event)" title="Click to view Raw Brick Travelers (कच्ची विट वाहतूक) section">
+            <div class="kpi-header">
+              <span class="kpi-title" data-i18n="admin_kpi_raw_reach_total">Raw Bricks Reached Kiln</span>
+              <div class="kpi-icon">🚜</div>
+            </div>
+            <div class="kpi-value" id="kpi-raw-reach-total">0</div>
+            <div class="kpi-subtitle">
+              <span>📅 Today: </span><strong id="kpi-raw-reach-today" style="color:#fff;">0</strong>
+              <span style="color: #FB923C; margin-left: 6px;">🚜 Land ➔ Kiln &rarr;</span>
+            </div>
+          </div>
+
+          <!-- 2. Total Delivered Bricks (All-time + Today) -->
+          <div class="kpi-card" style="--color-terracotta: #3B82F6;">
+            <div class="kpi-header">
+              <span class="kpi-title" data-i18n="admin_kpi_total_delivered">Total Delivered Bricks</span>
+              <div class="kpi-icon">🚚</div>
+            </div>
+            <div class="kpi-value" id="kpi-lifetime-delivered">0</div>
+            <div class="kpi-subtitle">
+              <span>📅 Today: </span><strong id="kpi-total-delivered" style="color:#fff;">0</strong>
+              <span id="kpi-delivered-breakdown">• 🚜 0 • 🚚 0</span>
+            </div>
+          </div>
+
+          <!-- 3. Current Kiln Stock Balance -->
+          <div class="kpi-card" style="--color-terracotta: #10B981;">
+            <div class="kpi-header">
+              <span class="kpi-title" data-i18n="admin_kpi_stock">Kiln Stock Balance</span>
+              <div class="kpi-icon">📦</div>
+            </div>
+            <div class="kpi-value" id="kpi-stock-balance" style="color: #34D399;">0</div>
+            <div class="kpi-subtitle">
+              <span data-i18n="admin_kpi_stock_sub">Available yard stock (Mfg − Delivered)</span>
+            </div>
+          </div>
+
+          <!-- 4. Active Workers on Duty -->
+          <div class="kpi-card" style="--color-terracotta: var(--color-info);">
+            <div class="kpi-header">
+              <span class="kpi-title" data-i18n="admin_kpi_workers">Workers on Duty</span>
+              <div class="kpi-icon">👷</div>
+            </div>
+            <div class="kpi-value" id="kpi-active-workers">0 / 0</div>
+            <div class="kpi-subtitle">
+              <span>Active molders & kiln staff</span>
+            </div>
+          </div>
+
+          <!-- 5. Average per Worker -->
+          <div class="kpi-card" style="--color-terracotta: var(--color-warning);">
+            <div class="kpi-header">
+              <span class="kpi-title" data-i18n="admin_kpi_avg">Avg per Worker</span>
+              <div class="kpi-icon">⚡</div>
+            </div>
+            <div class="kpi-value" id="kpi-avg-per-worker">0</div>
+            <div class="kpi-subtitle">
+              <span>Bricks molded / staff today</span>
+            </div>
+          </div>
+
+          <!-- 6. Total Daily Wages -->
+          <div class="kpi-card" style="--color-terracotta: var(--color-success);">
+            <div class="kpi-header">
+              <span class="kpi-title" data-i18n="admin_kpi_wages">Total Daily Wages</span>
+              <div class="kpi-icon">💰</div>
+            </div>
+            <div class="kpi-value" id="kpi-total-wages">₹0</div>
+            <div class="kpi-subtitle">
+              <span>Piece-rate auto-calculated</span>
+            </div>
+          </div>
+        </div>
+
+    <!-- 2-Column: Quick Log Form & Production Chart -->
+    <div class="dashboard-grid-2" id="dashboard-forms-grid">
+      
+      <!-- Quick Log Entry Form -->
+      <div class="dash-panel" id="section-record-production">
+        <div class="panel-header">
+          <h2 class="panel-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <span data-i18n="admin_form_heading">Record Worker Production</span>
+          </h2>
+        </div>
+
+        <form id="daily-log-form" novalidate>
+          <div class="form-group-admin">
+            <label for="log-worker-select" class="form-label-admin">
+              <span data-i18n="admin_form_select_worker">Select Worker *</span>
+              <a href="javascript:void(0)" id="btn-open-worker-modal" style="color: var(--color-terracotta-light); font-size: 0.75rem;"><span data-i18n="admin_form_add_new">+ Add New</span></a>
+            </label>
+            <select id="log-worker-select" class="form-control-admin" required>
+              <option value="">-- Loading Workers... --</option>
+            </select>
+          </div>
+
+          <!-- Daily Manufacturing Limit Badge & Inline Edit -->
+          <div id="worker-limit-display" class="worker-limit-badge-box">
+            <div class="limit-info-left">
+              <span class="limit-title" data-i18n="admin_limit_label">Daily Manufacturing Limit:</span>
+              <strong id="current-worker-limit" class="limit-value-badge">--</strong>
+              <button type="button" class="btn-edit-limit-inline" id="btn-edit-current-limit" title="Set this worker's daily limit">
+                <span data-i18n="admin_limit_btn_edit">⚙️ Edit Limit</span>
+              </button>
+            </div>
+            <div class="limit-info-right" id="limit-status-pill">
+              <span class="limit-status-tag limit-tag-ok" id="limit-status-text">--</span>
+            </div>
+          </div>
+
+          <div class="form-row-admin-2">
+            <div class="form-group-admin">
+              <label for="log-task-stage" class="form-label-admin" data-i18n="admin_form_stage">Task Stage</label>
+              <select id="log-task-stage" class="form-control-admin">
+                <option value="Hand Molding">Hand Molding</option>
+                <option value="Pug Press">Pug Press</option>
+                <option value="Stacking">Stacking & Shed Drying</option>
+                <option value="Kiln Loading">Kiln Loading & Firing</option>
+              </select>
+            </div>
+
+            <div class="form-group-admin">
+              <label for="log-shift" class="form-label-admin" data-i18n="admin_form_shift">Shift</label>
+              <select id="log-shift" class="form-control-admin">
+                <option value="Morning">Morning (6 AM - 2 PM)</option>
+                <option value="Evening">Evening (2 PM - 10 PM)</option>
+                <option value="Full Day">Full Day</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row-admin-2">
+            <div class="form-group-admin">
+              <label for="log-gross-count" class="form-label-admin" data-i18n="admin_form_gross">Gross Molded</label>
+              <input type="number" id="log-gross-count" class="form-control-admin" placeholder="e.g. 1500" min="1" step="any" required>
+            </div>
+
+            <div class="form-group-admin">
+              <label for="log-date" class="form-label-admin" data-i18n="admin_form_date">Date</label>
+              <input type="date" id="log-date" class="form-control-admin" required>
+            </div>
+          </div>
+
+          <!-- Live Wage Auto Preview -->
+          <div class="auto-wage-box">
+            <div>
+              <span style="font-size: 0.75rem; color: var(--color-text-dim); display: block;" data-i18n="admin_form_net_label">NET COUNT</span>
+              <strong id="preview-net-count">0 Bricks</strong>
+            </div>
+            <div style="text-align: right;">
+              <span style="font-size: 0.75rem; color: var(--color-text-dim); display: block;" data-i18n="admin_form_wage_label">ESTIMATED WAGE</span>
+              <strong id="preview-calculated-wage" style="color: var(--color-whatsapp);">₹0.00</strong>
+            </div>
+          </div>
+
+          <button type="submit" id="btn-save-production" class="btn-admin btn-terracotta" style="width: 100%; justify-content: center; padding: 12px; cursor: pointer;">
+            <span data-i18n="admin_form_submit">Save Production Entry</span>
+          </button>
+        </form>
+      </div>
+
+      <!-- Visual Performance Chart & Stages -->
+      <div class="dash-panel" id="section-chart">
+        <div class="panel-header">
+          <h2 class="panel-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+            <span data-i18n="admin_chart_heading">Top Worker Output Today</span>
+          </h2>
+          <span style="font-size: 0.75rem; color: var(--color-text-dim);">Net bricks per worker</span>
+        </div>
+
+        <div class="chart-container">
+          <div class="chart-bars-wrap" id="production-bars-container">
+            <!-- Rendered dynamically by admin.js -->
+          </div>
+
+          <!-- Stage Breakdown Summary -->
+          <div class="stages-summary-row">
+            <div class="stage-pill-box">
+              <span>Hand Molding</span>
+              <strong id="stage-molding-count">0</strong>
+            </div>
+            <div class="stage-pill-box">
+              <span>Pug Press</span>
+              <strong id="stage-press-count">0</strong>
+            </div>
+            <div class="stage-pill-box">
+              <span>Stacking</span>
+              <strong id="stage-stack-count">0</strong>
+            </div>
+            <div class="stage-pill-box">
+              <span>Kiln Loading</span>
+              <strong id="stage-kiln-count">0</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Worker-by-Worker Breakdown & Directory Table -->
+    <div class="table-panel" id="section-workers-table">
+      <div class="table-toolbar">
+        <div>
+          <h2 class="panel-title" id="table-panel-title" data-i18n="admin_table_heading">Workers Directory & Production Breakdown</h2>
+          <p style="font-size: 0.8rem; color: var(--color-text-dim); margin-top: 2px;" id="table-panel-sub" data-i18n="admin_table_sub">Detailed tracking of all workers, daily output, lifetime total production, and taken leaves</p>
+        </div>
+
+        <div class="table-toolbar-actions">
+          <!-- Table View Dropdown Selector -->
+          <div class="table-view-dropdown-wrap">
+            <label for="table-view-select" class="table-view-label" data-i18n="admin_view_label">View Mode:</label>
+            <select id="table-view-select" class="form-control-admin table-view-select" onchange="switchTableView(this.value)">
+              <option value="directory" data-i18n="admin_tab_all_workers">👷 All Workers (Details, Total & Leaves)</option>
+              <option value="logs" data-i18n="admin_tab_daily_logs">📋 Daily Production Logs</option>
+            </select>
+          </div>
+
+          <div class="search-input-wrap">
+            <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input type="text" id="table-search-input" class="search-input" placeholder="Search worker name...">
+          </div>
+
+          <button type="button" class="btn-admin btn-terracotta" onclick="openWorkerModal()" title="Add new worker to roster">
+            <span>+ Add Worker</span>
+          </button>
+
+          <button type="button" class="btn-admin btn-outline" onclick="openLeaveModal()" title="Mark leave for any worker">
+            <span data-i18n="admin_btn_mark_leave">+ Mark Leave</span>
+          </button>
+
+          <button type="button" class="btn-admin btn-outline" onclick="exportProductionCSV()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            <span data-i18n="admin_table_export">Export CSV</span>
+          </button>
+
+          <button type="button" class="btn-admin btn-terracotta" onclick="exportCompleteDataPDF()" title="Download Complete Database in PDF">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+            <span data-i18n="admin_btn_download_pdf">PDF Report</span>
+          </button>
+
+          <button type="button" class="btn-admin btn-outline btn-clear-data" onclick="clearAllProductionData()" title="Clear all logs & workers to start completely fresh">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            <span data-i18n="admin_table_clear_data">Clear All Data</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="table-wrap-admin">
+        <table class="admin-table">
+          <thead id="worker-table-head">
+            <!-- Dynamically populated based on active view -->
+          </thead>
+          <tbody id="worker-table-body">
+            <!-- Dynamically populated by admin.js -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ==========================================
+         BRICK DELIVERIES & TRANSPORT DISPATCH MANAGEMENT
+         ========================================== -->
+    <div class="delivery-section-wrap" id="section-deliveries">
+      <div class="dashboard-grid-2">
+
+        <!-- Left: Quick Delivery Entry Form -->
+        <div class="dash-panel">
+          <div class="panel-header">
+            <h2 class="panel-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
+              <span data-i18n="admin_form_delivery_title">Record Brick Dispatch / Delivery</span>
+            </h2>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span class="delivery-badge-indicator" id="delivery-cloud-badge" style="background: rgba(52, 211, 153, 0.15); color: #34D399; border: 1px solid rgba(52, 211, 153, 0.35); font-size: 0.72rem; font-weight: 700; padding: 3px 8px; border-radius: 10px;">☁️ Firebase Synced</span>
+              <span class="delivery-badge-indicator" id="delivery-form-date-indicator">--</span>
+            </div>
+          </div>
+
+          <form id="delivery-dispatch-form" novalidate>
+            <!-- Transporter / Driver Name with Autocomplete/Saved Suggestions -->
+            <div class="form-group-admin">
+              <label for="delivery-transporter-input" class="form-label-admin">
+                <span data-i18n="admin_delivery_transporter">Transporter / Driver Name *</span>
+                <span style="font-size: 0.72rem; color: var(--color-text-dim); font-weight: normal;" id="transporters-saved-hint">(Saved transporters autocomplete)</span>
+              </label>
+              <input type="text" id="delivery-transporter-input" list="transporter-datalist" class="form-control-admin" placeholder="e.g. Santosh Shinde / Gurukrupa Transport" required autocomplete="off">
+              <datalist id="transporter-datalist">
+                <!-- Dynamically populated from saved transporters in localStorage -->
+              </datalist>
+            </div>
+
+            <!-- Vehicle Type (Trolley vs Truck) & Vehicle Number -->
+            <div class="form-row-admin-2">
+              <div class="form-group-admin">
+                <label for="delivery-vehicle-type" class="form-label-admin" data-i18n="admin_delivery_vehicle_type">Vehicle Type *</label>
+                <select id="delivery-vehicle-type" class="form-control-admin" required>
+                  <option value="Trolley" data-i18n="admin_delivery_type_trolley">🚜 Tractor Trolley (ट्रॅक्टर ट्रॉली)</option>
+                  <option value="Truck" data-i18n="admin_delivery_type_truck">🚚 Heavy Truck (ट्रक / डंपर)</option>
+                </select>
+              </div>
+
+              <div class="form-group-admin">
+                <label for="delivery-vehicle-no" class="form-label-admin" data-i18n="admin_delivery_vehicle_no">Vehicle Number</label>
+                <input type="text" id="delivery-vehicle-no" class="form-control-admin" placeholder="e.g. MH 12 AB 1234">
+              </div>
+            </div>
+
+            <!-- Brick Quantity & Customer / Destination -->
+            <div class="form-row-admin-2">
+              <div class="form-group-admin">
+                <label for="delivery-brick-count" class="form-label-admin" data-i18n="admin_delivery_count">Delivered Bricks Quantity *</label>
+                <input type="number" id="delivery-brick-count" class="form-control-admin" placeholder="e.g. 3000" min="1" step="1" required>
+              </div>
+
+              <div class="form-group-admin">
+                <label for="delivery-customer-name" class="form-label-admin" data-i18n="admin_delivery_customer">Customer / Site Destination</label>
+                <input type="text" id="delivery-customer-name" class="form-control-admin" placeholder="e.g. Wagholi Site / Sachin Jadhav">
+              </div>
+            </div>
+
+            <!-- Dispatch Date & Driver Phone -->
+            <div class="form-row-admin-2">
+              <div class="form-group-admin">
+                <label for="delivery-date-input" class="form-label-admin" data-i18n="admin_delivery_date">Dispatch Date</label>
+                <input type="date" id="delivery-date-input" class="form-control-admin" required>
+              </div>
+
+              <div class="form-group-admin">
+                <label for="delivery-driver-phone" class="form-label-admin">Driver Contact / Phone</label>
+                <input type="tel" id="delivery-driver-phone" class="form-control-admin" placeholder="e.g. 9876543210">
+              </div>
+            </div>
+
+            <button type="submit" id="btn-save-delivery" class="btn-admin btn-terracotta" style="width: 100%; justify-content: center; padding: 12px; margin-top: 8px;">
+              <span data-i18n="admin_delivery_btn_save">Save Delivery Dispatch Entry</span>
+            </button>
+          </form>
+        </div>
+
+        <!-- Right: Dispatch Summary & Vehicle Breakdown Cards -->
+        <div class="dash-panel">
+          <div class="panel-header">
+            <h2 class="panel-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
+              <span data-i18n="admin_delivery_summary_title">Today's Dispatch Summary</span>
+            </h2>
+            <span style="font-size: 0.75rem; color: var(--color-text-dim);" id="delivery-date-label">Selected Date</span>
+          </div>
+
+          <!-- Total Delivery Overview Cards (All-time & Today) -->
+          <div style="display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap;">
+            <div style="flex: 1; min-width: 150px; background: rgba(59, 130, 246, 0.12); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 8px; padding: 12px 14px;">
+              <span style="font-size: 0.72rem; color: #93C5FD; display: block; text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em;" data-i18n="admin_kpi_total_delivered">Total Delivered Bricks</span>
+              <strong id="deliveries-alltime-bricks" style="font-size: 1.35rem; color: #fff; font-family: var(--font-heading); display: block; margin: 2px 0;">0</strong>
+              <span id="deliveries-alltime-trips" style="font-size: 0.72rem; color: var(--color-text-dim);">0 total trips</span>
+            </div>
+            <div style="flex: 1; min-width: 150px; background: rgba(234, 88, 12, 0.12); border: 1px solid rgba(234, 88, 12, 0.3); border-radius: 8px; padding: 12px 14px;">
+              <span style="font-size: 0.72rem; color: #FDBA74; display: block; text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em;" data-i18n="admin_kpi_delivered">Today's Delivered Bricks</span>
+              <strong id="deliveries-today-bricks" style="font-size: 1.35rem; color: #fff; font-family: var(--font-heading); display: block; margin: 2px 0;">0</strong>
+              <span id="deliveries-today-trips" style="font-size: 0.72rem; color: var(--color-text-dim);">0 trips today</span>
+            </div>
+          </div>
+
+          <!-- 2 Big Vehicle Comparison Metric Cards: Trolley vs Truck -->
+          <div class="delivery-metrics-grid">
+            <!-- Tractor Trolley Card -->
+            <div class="delivery-stat-card trolley-card">
+              <div class="stat-card-top">
+                <div class="stat-card-icon">🚜</div>
+                <div class="stat-card-badge">Tractor Trolley</div>
+              </div>
+              <div class="stat-card-number" id="trolley-total-bricks">0</div>
+              <div class="stat-card-label" data-i18n="admin_kpi_trolley_total">Bricks Delivered by Trolley</div>
+              <div class="stat-card-footer">
+                <span id="trolley-total-trips">0 Trips / फेऱ्या</span>
+              </div>
+            </div>
+
+            <!-- Heavy Truck Card -->
+            <div class="delivery-stat-card truck-card">
+              <div class="stat-card-top">
+                <div class="stat-card-icon">🚚</div>
+                <div class="stat-card-badge">Heavy Truck</div>
+              </div>
+              <div class="stat-card-number" id="truck-total-bricks">0</div>
+              <div class="stat-card-label" data-i18n="admin_kpi_truck_total">Bricks Delivered by Truck</div>
+              <div class="stat-card-footer">
+                <span id="truck-total-trips">0 Trips / फेऱ्या</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Stored Transporters Directory Quick Chips -->
+          <div class="transporters-chip-section">
+            <div class="transporters-chip-header">
+              <span style="font-size: 0.78rem; font-weight: 700; color: var(--color-text-dim);">
+                📋 Stored Transporters (<span id="transporters-count">0</span>) • <span style="color: #34D399; font-weight: 700;">☁️ Firebase Connected</span>
+              </span>
+              <span style="font-size: 0.72rem; color: var(--color-text-muted);">Auto-saved with vehicle details</span>
+            </div>
+            <div class="transporters-chips-wrap" id="transporters-chips-container">
+              <!-- Rendered transporter tags -->
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Deliveries Table Panel -->
+      <div class="table-panel" style="margin-top: 24px;">
+        <div class="table-toolbar">
+          <div>
+            <h2 class="panel-title" style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+              <span data-i18n="admin_delivery_table_title">Delivery & Transporters Dispatch Log</span>
+              <span style="font-size: 0.72rem; color: #34D399; font-weight: 700; background: rgba(52, 211, 153, 0.12); padding: 2px 7px; border-radius: 8px; border: 1px solid rgba(52, 211, 153, 0.3);">☁️ Live in Firebase</span>
+            </h2>
+            <p style="font-size: 0.8rem; color: var(--color-text-dim); margin-top: 2px;" data-i18n="admin_delivery_sub">Track outward brick shipments by Tractor Trolley or Truck with Transporter records</p>
+          </div>
+
+          <div class="table-toolbar-actions">
+            <div class="search-input-wrap">
+              <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+              <input type="text" id="delivery-search-input" class="search-input" placeholder="Search transporter or destination...">
+            </div>
+
+            <button type="button" class="btn-admin btn-outline" onclick="exportDeliveryCSV()">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+              <span data-i18n="admin_delivery_export_csv">Export Deliveries CSV</span>
+            </button>
+
+            <button type="button" class="btn-admin btn-terracotta" onclick="exportCompleteDataPDF()" title="Download Complete Database in PDF">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+              <span data-i18n="admin_btn_download_pdf">PDF Report</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="table-wrap-admin">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th data-i18n="admin_delivery_th_transporter">Transporter & Vehicle</th>
+                <th data-i18n="admin_delivery_th_type">Vehicle Type</th>
+                <th data-i18n="admin_delivery_th_quantity">Delivered Bricks</th>
+                <th data-i18n="admin_delivery_th_customer">Customer & Site</th>
+                <th data-i18n="admin_delivery_th_date">Date</th>
+                <th style="text-align: right;" data-i18n="admin_delivery_th_action">Action</th>
+              </tr>
+            </thead>
+            <tbody id="delivery-table-body">
+              <!-- Rendered dynamically by admin.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==========================================
+         RAW BRICK TRAVELER WORKERS & KILN INWARD
+         (Transfer from molding land to kiln for firing)
+         ========================================== -->
+    <div class="delivery-section-wrap admin-page-section" id="section-raw-travelers">
+      
+      <!-- Dedicated Standalone Section Header Bar -->
+      <div class="dash-panel" style="margin-bottom: 22px; background: linear-gradient(135deg, rgba(234, 88, 12, 0.14) 0%, rgba(30, 41, 59, 0.7) 100%); border: 1.5px solid rgba(234, 88, 12, 0.35); padding: 18px 22px; border-radius: var(--radius-md);">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+          <div style="display: flex; align-items: center; gap: 14px;">
+            <div style="width: 46px; height: 46px; border-radius: 10px; background: rgba(234, 88, 12, 0.2); border: 1.5px solid rgba(234, 88, 12, 0.4); display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+              🚜
+            </div>
+            <div>
+              <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                <h2 style="font-size: 1.25rem; font-weight: 800; color: #fff; margin: 0; font-family: var(--font-heading);" data-i18n="admin_raw_travelers_title">
+                  Raw Brick Traveler Workers & Kiln Inward
+                </h2>
+                <span class="delivery-badge-indicator" style="background: rgba(234, 88, 12, 0.2); color: #FB923C; border-color: rgba(234, 88, 12, 0.4); font-weight: 700;">
+                  🚜 कच्ची विट वाहतूक
+                </span>
+              </div>
+              <p style="font-size: 0.82rem; color: var(--color-text-dim); margin: 4px 0 0 0;" data-i18n="admin_raw_travelers_desc">
+                Track green/raw brick transfer from manufacturing land to kiln, monitor workers, today's reached bricks, and all-time total reached bricks
+              </p>
+            </div>
+          </div>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <button type="button" class="btn-admin btn-terracotta" onclick="openRawTravelerWorkerModal()" style="font-size: 0.8rem; padding: 7px 12px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><line x1="19" y1="8" x2="19" y2="14"></line><line x1="22" y1="11" x2="16" y2="11"></line></svg>
+              <span data-i18n="admin_raw_travelers_btn_add_worker">+ Add Traveler Worker</span>
+            </button>
+            <button type="button" class="btn-admin btn-outline" onclick="shareRawTravelersWhatsApp()" style="font-size: 0.8rem; padding: 7px 12px; border-color: rgba(34, 197, 94, 0.4); color: #86EFAC;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2M12.05 3.67C14.25 3.67 16.31 4.53 17.87 6.09C19.42 7.65 20.28 9.72 20.28 11.92C20.28 16.46 16.58 20.15 12.04 20.15C10.56 20.15 9.11 19.76 7.85 19L7.55 18.83L4.43 19.65L5.26 16.61L5.06 16.29C4.24 14.99 3.8 13.47 3.8 11.91C3.81 7.37 7.5 3.67 12.05 3.67Z"/></svg>
+              <span>WhatsApp</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4 Top KPI Cards for Raw Brick Travelers -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 24px;">
+        <!-- Card 1: Today's Raw Bricks Reached Kiln -->
+        <div class="kpi-card" style="--color-terracotta: #EA580C; background: rgba(234, 88, 12, 0.08); border: 1.5px solid rgba(234, 88, 12, 0.35);">
+          <div class="kpi-header">
+            <span class="kpi-title" data-i18n="admin_kpi_raw_reach_today">Today's Bricks Reached Kiln</span>
+            <div class="kpi-icon">📅</div>
+          </div>
+          <div class="kpi-value" id="raw-travelers-today-bricks" style="color: #FB923C;">0</div>
+          <div class="kpi-subtitle">
+            <span id="raw-travelers-date-indicator">Selected Date</span>
+          </div>
+        </div>
+
+        <!-- Card 2: Total Reached Bricks to Kiln (All-Time) -->
+        <div class="kpi-card" style="--color-terracotta: #10B981; background: rgba(16, 185, 129, 0.08); border: 1.5px solid rgba(16, 185, 129, 0.35);">
+          <div class="kpi-header">
+            <span class="kpi-title" data-i18n="admin_kpi_raw_reach_total">Total Reached Bricks to Kiln</span>
+            <div class="kpi-icon">🧱</div>
+          </div>
+          <div class="kpi-value" id="raw-travelers-alltime-bricks" style="color: #34D399;">0</div>
+          <div class="kpi-subtitle">
+            <span id="raw-travelers-alltime-subtitle">Cumulative green bricks in kiln</span>
+          </div>
+        </div>
+
+        <!-- Card 3: Today's Transit Trips -->
+        <div class="kpi-card" style="--color-terracotta: #3B82F6; background: rgba(59, 130, 246, 0.08); border: 1.5px solid rgba(59, 130, 246, 0.35);">
+          <div class="kpi-header">
+            <span class="kpi-title" data-i18n="admin_kpi_raw_reach_trips">Today's Transit Trips</span>
+            <div class="kpi-icon">🔄</div>
+          </div>
+          <div class="kpi-value" id="raw-travelers-today-trips" style="color: #93C5FD;">0</div>
+          <div class="kpi-subtitle">
+            <span id="raw-travelers-alltime-trips">0 total trips recorded</span>
+          </div>
+        </div>
+
+        <!-- Card 4: Active Traveler Workers -->
+        <div class="kpi-card" style="--color-terracotta: #8B5CF6; background: rgba(139, 92, 246, 0.08); border: 1.5px solid rgba(139, 92, 246, 0.35);">
+          <div class="kpi-header">
+            <span class="kpi-title" data-i18n="admin_kpi_raw_travelers_count">Active Traveler Workers</span>
+            <div class="kpi-icon">👷</div>
+          </div>
+          <div class="kpi-value" id="raw-travelers-active-count" style="color: #C4B5FD;">0</div>
+          <div class="kpi-subtitle">
+            <span>Carrying raw bricks to kiln</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2-Column: Left Inward Form & Right Workers Roster -->
+      <div class="dashboard-grid-2">
+
+        <!-- Left: Record Raw Bricks Reached Kiln Form -->
+        <div class="dash-panel">
+          <div class="panel-header">
+            <h2 class="panel-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+              <span data-i18n="admin_raw_travelers_form_title">Record Raw Bricks Reached to Kiln</span>
+            </h2>
+            <span class="delivery-badge-indicator" id="raw-traveler-form-date-badge">Today</span>
+          </div>
+
+          <!-- Alert banner when no manufactured bricks are available on land -->
+          <div id="no-production-alert" style="display: none; background: rgba(239, 68, 68, 0.1); border: 1.5px solid rgba(239, 68, 68, 0.4); border-radius: 8px; padding: 12px 14px; margin-bottom: 14px; color: #FCA5A5; font-size: 0.85rem;">
+            <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; color: #EF4444; margin-bottom: 4px;">
+              <span>⚠️</span>
+              <span class="no-prod-title" data-i18n="admin_raw_no_production_title">No Manufactured Bricks Available on Land</span>
+            </div>
+            <div class="no-prod-desc" style="font-size: 0.8rem; line-height: 1.4; color: #FCA5A5;" data-i18n="admin_raw_no_production_desc">
+              Raw bricks must first be manufactured by workers and recorded in the "Daily Production" section before they can be delivered to the kiln.
+            </div>
+          </div>
+
+          <form id="raw-traveler-entry-form" novalidate>
+            <!-- Traveler Worker Select & Transport Mode -->
+            <div class="form-row-admin-2">
+              <div class="form-group-admin">
+                <label for="raw-entry-worker-select" class="form-label-admin">
+                  <span data-i18n="admin_raw_travelers_worker_select">Select Traveler Worker *</span>
+                  <a href="javascript:void(0)" onclick="openRawTravelerWorkerModal()" style="color: var(--color-terracotta-light); font-size: 0.75rem; text-decoration: none;">
+                    <span data-i18n="admin_raw_travelers_btn_add_worker">+ Add New</span>
+                  </a>
+                </label>
+                <select id="raw-entry-worker-select" class="form-control-admin" required>
+                  <option value="">-- Select Worker --</option>
+                </select>
+              </div>
+
+              <div class="form-group-admin">
+                <label for="raw-entry-transport-mode" class="form-label-admin" data-i18n="admin_raw_travelers_transport_mode">Transport Vehicle / Mode *</label>
+                <select id="raw-entry-transport-mode" class="form-control-admin" required>
+                  <option value="Tractor Trolley">🚜 Tractor Trolley (ट्रॅक्टर ट्रॉली)</option>
+                  <option value="Hand Cart">🛒 Hand Cart / Thela (हातगाडी / ठेला)</option>
+                  <option value="Wheelbarrow">🛞 Wheelbarrow / Trolley (चाक गाडी)</option>
+                  <option value="Head-Load">🧺 Head-Load / Basket (टोपली / डोक्यावरून)</option>
+                  <option value="Animal Cart">🐴 Animal Cart (बैलगाडी / घोडागाडी)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Brick Manufacturing Worker & Destination Kiln Chamber -->
+            <div class="form-row-admin-2">
+              <div class="form-group-admin">
+                <label for="raw-entry-source-land" class="form-label-admin">
+                  <span data-i18n="admin_raw_travelers_source_land">Brick Manufacturing Worker *</span>
+                </label>
+                <select id="raw-entry-source-land" class="form-control-admin" required>
+                  <option value="">-- Select Manufacturing Worker --</option>
+                </select>
+                <div id="molder-available-stock-badge" style="display: none; margin-top: 6px; padding: 7px 11px; border-radius: 6px; font-size: 0.78rem; background: rgba(234, 88, 12, 0.1); border: 1px solid rgba(234, 88, 12, 0.35); color: #FED7AA;"></div>
+              </div>
+
+              <div class="form-group-admin">
+                <label for="raw-entry-dest-chamber" class="form-label-admin">
+                  <span data-i18n="admin_raw_travelers_dest_chamber">Destination Kiln Chamber *</span>
+                </label>
+                <input type="text" id="raw-entry-dest-chamber" list="raw-dest-chamber-datalist" class="form-control-admin" placeholder="e.g. Kiln Chamber #1 / North Bhatti" required autocomplete="off">
+                <datalist id="raw-dest-chamber-datalist">
+                  <option value="Kiln Chamber #1 (भट्टी चेंबर १)">
+                  <option value="Kiln Chamber #2 (भट्टी चेंबर २)">
+                  <option value="Kiln Chamber #3 (भट्टी चेंबर ३)">
+                  <option value="North Trench Bhatti (उत्तर ट्रेंच भट्टी)">
+                  <option value="South Trench Bhatti (दक्षिण ट्रेंच भट्टी)">
+                </datalist>
+              </div>
+            </div>
+
+            <!-- Trips, Bricks per Trip & Total Reached Bricks -->
+            <div class="form-row-admin-3" style="display: grid; grid-template-columns: 1fr 1fr 1.2fr; gap: 12px;">
+              <div class="form-group-admin">
+                <label for="raw-entry-trips" class="form-label-admin">
+                  <span data-i18n="admin_raw_travelers_trips">Trips *</span>
+                </label>
+                <input type="number" id="raw-entry-trips" class="form-control-admin" value="1" min="1" step="1" required>
+              </div>
+
+              <div class="form-group-admin">
+                <label for="raw-entry-per-trip" class="form-label-admin">
+                  <span data-i18n="admin_raw_travelers_bricks_per_trip">Per Trip</span>
+                </label>
+                <input type="number" id="raw-entry-per-trip" class="form-control-admin" placeholder="e.g. 2500" min="1" step="1">
+              </div>
+
+              <div class="form-group-admin">
+                <label for="raw-entry-bricks-count" class="form-label-admin" style="color: #FB923C;">
+                  <span data-i18n="admin_raw_travelers_bricks_total">Total Reached Bricks *</span>
+                </label>
+                <input type="number" id="raw-entry-bricks-count" class="form-control-admin" placeholder="e.g. 2500" min="1" step="1" required style="border-color: rgba(234, 88, 12, 0.5); font-weight: 700; color: #fff;">
+                <div id="raw-entry-bricks-limit-msg" style="display: none; margin-top: 4px; font-size: 0.75rem; color: #F87171; font-weight: 600;"></div>
+              </div>
+            </div>
+
+            <!-- Transfer Date -->
+            <div class="form-group-admin">
+              <label for="raw-entry-date" class="form-label-admin" data-i18n="admin_raw_travelers_date">Transfer Date *</label>
+              <input type="date" id="raw-entry-date" class="form-control-admin" required>
+              <input type="hidden" id="raw-entry-rate" value="250">
+            </div>
+
+
+            <!-- Notes -->
+            <div class="form-group-admin">
+              <label for="raw-entry-notes" class="form-label-admin" data-i18n="admin_raw_travelers_notes">Chamber / Quality Remarks</label>
+              <input type="text" id="raw-entry-notes" class="form-control-admin" placeholder="e.g. Stacked in lower layer, clean sun-dried batch">
+            </div>
+
+            <button type="submit" id="btn-save-raw-traveler-entry" class="btn-admin btn-terracotta" style="width: 100%; justify-content: center; padding: 12px; margin-top: 4px;">
+              <span data-i18n="admin_raw_travelers_btn_save">+ Save Kiln Inward Entry</span>
+            </button>
+          </form>
+        </div>
+
+        <!-- Right: Traveler Workers Roster & Worker Cards -->
+        <div class="dash-panel">
+          <div class="panel-header">
+            <h2 class="panel-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+              <span data-i18n="admin_raw_travelers_workers_title">Raw Brick Traveler Workers Roster</span>
+            </h2>
+            <button type="button" class="btn-admin btn-outline" onclick="openRawTravelerWorkerModal()" style="font-size: 0.75rem; padding: 5px 10px;">
+              <span data-i18n="admin_raw_travelers_btn_add_worker">+ Add Worker</span>
+            </button>
+          </div>
+
+          <p style="font-size: 0.8rem; color: var(--color-text-dim); margin-top: -6px; margin-bottom: 14px;">
+            Workers shifting sun-dried green bricks from land to kiln for firing.
+          </p>
+
+          <!-- List of Traveler Workers -->
+          <div id="raw-travelers-workers-list" style="display: flex; flex-direction: column; gap: 10px; max-height: 520px; overflow-y: auto; padding-right: 4px;">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Full-Width Bottom Table: Raw Bricks Kiln Inward Audit Register -->
+      <div class="table-panel" style="margin-top: 24px;">
+        <div class="table-toolbar" style="flex-wrap: wrap; gap: 12px;">
+          <div>
+            <h2 class="table-title" data-i18n="admin_raw_travelers_logs_title">Raw Bricks Kiln Inward Audit Register</h2>
+            <p class="table-subtitle" data-i18n="admin_raw_travelers_logs_sub">Complete ledger of all raw bricks transported from molding land to kiln chambers</p>
+          </div>
+
+          <div class="table-actions" style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+            <!-- Filter by Worker -->
+            <select id="raw-travelers-filter-worker" class="form-control-admin" style="font-size: 0.8rem; padding: 6px 10px; width: auto; min-width: 150px;">
+              <option value="ALL">All Traveler Workers</option>
+            </select>
+
+            <!-- Filter Date Picker -->
+            <input type="date" id="raw-travelers-filter-date" class="form-control-admin" style="font-size: 0.8rem; padding: 6px 10px; width: auto;">
+
+            <button type="button" class="btn-admin btn-outline" onclick="setRawTravelersDateFilter('today')" style="font-size: 0.78rem; padding: 7px 10px;">Today</button>
+            <button type="button" class="btn-admin btn-outline" onclick="setRawTravelersDateFilter('all')" style="font-size: 0.78rem; padding: 7px 10px;">All Time</button>
+
+            <!-- WhatsApp Report -->
+            <button type="button" class="btn-admin btn-outline" onclick="shareRawTravelersWhatsApp()" title="Share WhatsApp Summary" style="border-color: rgba(34, 197, 94, 0.4); color: #86EFAC;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2M12.05 3.67C14.25 3.67 16.31 4.53 17.87 6.09C19.42 7.65 20.28 9.72 20.28 11.92C20.28 16.46 16.58 20.15 12.04 20.15C10.56 20.15 9.11 19.76 7.85 19L7.55 18.83L4.43 19.65L5.26 16.61L5.06 16.29C4.24 14.99 3.8 13.47 3.8 11.91C3.81 7.37 7.5 3.67 12.05 3.67Z"/></svg>
+              <span data-i18n="admin_raw_travelers_wa_report">WhatsApp</span>
+            </button>
+
+            <!-- Export CSV -->
+            <button type="button" class="btn-admin btn-outline" onclick="exportRawTravelersCSV()" style="font-size: 0.78rem; padding: 7px 10px;">
+              <span data-i18n="admin_raw_travelers_export_csv">Export CSV</span>
+            </button>
+
+            <!-- Download PDF -->
+            <button type="button" class="btn-admin btn-outline" onclick="exportRawTravelersPDF()" style="border-color: rgba(239, 68, 68, 0.4); color: #FCA5A5; font-size: 0.78rem; padding: 7px 10px;">
+              <span data-i18n="admin_raw_travelers_pdf">Download PDF</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th data-i18n="admin_raw_travelers_th_datetime">Date & Time</th>
+                <th data-i18n="admin_raw_travelers_th_worker">Traveler Worker & Vehicle</th>
+                <th data-i18n="admin_raw_travelers_th_route">Route (Land ➔ Kiln Chamber)</th>
+                <th data-i18n="admin_raw_travelers_th_trips">Trips</th>
+                <th data-i18n="admin_raw_travelers_th_bricks">Bricks Reached Kiln</th>
+                <th style="text-align: right;" data-i18n="admin_raw_travelers_th_action">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="raw-travelers-logs-tbody">
+              <!-- Rendered dynamically by admin.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ==========================================
+         RAW MATERIAL INWARD (SOIL & COAL TRUCKS & IMPORTER KHATA)
+         ========================================== -->
+    <div class="delivery-section-wrap" id="section-raw-materials">
+      <div class="dashboard-grid-2">
+
+        <!-- Left: Inward Delivery Form -->
+        <div class="dash-panel">
+          <div class="panel-header">
+            <h2 class="panel-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+              <span data-i18n="admin_raw_form_title">Record Soil / Coal Inward Delivery</span>
+            </h2>
+            <div class="raw-panel-badges">
+              <span class="delivery-badge-indicator" id="raw-cloud-badge">☁️ Firebase Synced</span>
+              <span class="delivery-badge-indicator" id="raw-form-date-indicator">Raw Material</span>
+            </div>
+          </div>
+
+          <form id="raw-material-form" novalidate>
+            <!-- Material Selector: Soil vs Coal -->
+            <div class="form-group-admin">
+              <label class="form-label-admin">
+                <span data-i18n="admin_raw_material_type">Material Type *</span>
+                <span class="label-hint">(माती किंवा कोळसा निवडा)</span>
+              </label>
+              <div class="raw-material-toggle-grid">
+                <label class="material-type-pill active" id="pill-mat-soil">
+                  <input type="radio" name="raw-material-type" value="Soil" checked>
+                  <strong>🚜 Soil (लाल माती)</strong>
+                </label>
+                <label class="material-type-pill" id="pill-mat-coal">
+                  <input type="radio" name="raw-material-type" value="Coal">
+                  <strong>⛏️ Coal (दगडी कोळसा)</strong>
+                </label>
+              </div>
+            </div>
+
+            <!-- Importer / Supplier Name (Full width for clear supplier identification) -->
+            <div class="form-group-admin">
+              <label for="raw-importer-name" class="form-label-admin">
+                <span data-i18n="admin_raw_importer_name">Importer / Supplier Name *</span>
+                <span class="label-hint">(पुरवठादार / आयातदार नाव)</span>
+              </label>
+              <input type="text" id="raw-importer-name" list="raw-importers-datalist" class="form-control-admin" placeholder="e.g. Ramesh Patil / Deccan Minerals" required autocomplete="off">
+              <datalist id="raw-importers-datalist"></datalist>
+            </div>
+
+            <!-- Inward Date & Importer Phone (Clean 2-Column Pair) -->
+            <div class="form-row-admin-2">
+              <div class="form-group-admin">
+                <label for="raw-date" class="form-label-admin">
+                  <span data-i18n="admin_raw_date">Inward Date *</span>
+                  <span class="label-hint">(आवक तारीख)</span>
+                </label>
+                <input type="date" id="raw-date" class="form-control-admin" required>
+              </div>
+
+              <div class="form-group-admin">
+                <label for="raw-importer-phone" class="form-label-admin">
+                  <span data-i18n="admin_raw_importer_phone">Importer Contact / Phone</span>
+                  <span class="label-hint">(व्हॉट्सॲप पावती)</span>
+                </label>
+                <input type="tel" id="raw-importer-phone" class="form-control-admin" placeholder="e.g. 9822001122">
+              </div>
+            </div>
+
+            <!-- Trucks Count (Compact) & Vehicle No (Spacious) -->
+            <div class="raw-trucks-row">
+              <div class="form-group-admin">
+                <label for="raw-trucks-count" class="form-label-admin">
+                  <span data-i18n="admin_raw_trucks_count">Trucks Count *</span>
+                  <span class="label-hint">(संख्या)</span>
+                </label>
+                <input type="number" id="raw-trucks-count" class="form-control-admin" placeholder="e.g. 2" min="1" step="1" value="1" required>
+              </div>
+
+              <div class="form-group-admin">
+                <label for="raw-vehicle-no" class="form-label-admin">
+                  <span data-i18n="admin_raw_vehicle_no">Vehicle / Truck No.</span>
+                  <span class="label-hint">(गाडी क्रमांक)</span>
+                </label>
+                <input type="text" id="raw-vehicle-no" class="form-control-admin" placeholder="e.g. MH 12 AB 3456">
+              </div>
+            </div>
+
+            <!-- Total Bill Value & Amount Paid (Clean 2-Column Pair) -->
+            <div class="form-row-admin-2">
+              <div class="form-group-admin">
+                <label for="raw-total-value" class="form-label-admin">
+                  <span data-i18n="admin_raw_total_value">Total Delivery Bill Value (₹) *</span>
+                  <span class="label-hint">(खरेदी बिल)</span>
+                </label>
+                <input type="number" id="raw-total-value" class="form-control-admin" placeholder="e.g. 35000" min="0" step="any" required>
+              </div>
+
+              <div class="form-group-admin">
+                <label for="raw-amount-paid" class="form-label-admin">
+                  <span data-i18n="admin_raw_amount_paid">Amount Given / Paid (₹) *</span>
+                  <span class="label-hint">(दिलेली रक्कम)</span>
+                </label>
+                <input type="number" id="raw-amount-paid" class="form-control-admin" placeholder="e.g. 20000" min="0" step="any" required>
+              </div>
+            </div>
+
+            <!-- Live Khata Balance Calculation Preview Box -->
+            <div id="raw-balance-preview-box">
+              <div>
+                <span class="balance-preview-label" data-i18n="admin_raw_remaining_label">REMAINING DUE TO IMPORTER (शिल्लक बाकी)</span>
+                <strong id="preview-raw-remaining">₹0.00</strong>
+              </div>
+              <div id="preview-raw-status-tag">
+                <span class="badge-status-tag">✅ Paid / पूर्ण भरले</span>
+              </div>
+            </div>
+
+            <!-- Notes / Challan No. -->
+            <div class="form-group-admin">
+              <label for="raw-notes" class="form-label-admin">
+                <span data-i18n="admin_raw_notes">Challan No. / Quality Remarks</span>
+                <span class="label-hint">(चलन / पावती क्र.)</span>
+              </label>
+              <input type="text" id="raw-notes" class="form-control-admin" placeholder="e.g. Challan #412, Silt rich black soil / Grade 1 Coal">
+            </div>
+
+            <button type="submit" id="btn-save-raw-material" class="btn-admin btn-terracotta" style="width: 100%; justify-content: center; padding: 13px; margin-top: 8px; font-weight: 700; font-size: 0.95rem;">
+              <span data-i18n="admin_raw_btn_save">+ Save Soil/Coal Inward Delivery</span>
+            </button>
+          </form>
+        </div>
+
+        <!-- Right: Summary KPI Cards & Overview -->
+        <div class="dash-panel">
+          <div class="panel-header">
+            <h2 class="panel-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+              <span data-i18n="admin_raw_kpi_title">Raw Materials & Payment Khata Summary</span>
+            </h2>
+            <span style="font-size: 0.75rem; color: var(--color-text-dim);" id="raw-summary-date-badge">All-Time Totals</span>
+          </div>
+
+          <!-- 2 Material Trucks Counter Cards (Soil vs Coal) -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+            <!-- Soil Card -->
+            <div style="background: rgba(184, 69, 40, 0.12); border: 1.5px solid rgba(184, 69, 40, 0.35); border-radius: 8px; padding: 14px 16px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                <span style="font-size: 0.75rem; color: #FDBA74; text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em;" data-i18n="admin_kpi_soil_trucks">🚜 Soil Inward (माती)</span>
+                <span id="raw-soil-today-tag" style="font-size: 0.7rem; background: rgba(184, 69, 40, 0.3); padding: 2px 6px; border-radius: 4px; color: #fff;">Today: 0</span>
+              </div>
+              <strong id="kpi-raw-soil-trucks" style="font-size: 1.7rem; color: #fff; font-family: var(--font-heading); display: block;">0</strong>
+              <span id="kpi-raw-soil-subtitle" style="font-size: 0.75rem; color: var(--color-text-dim);">0 Total Trucks (ट्रक्स)</span>
+            </div>
+
+            <!-- Coal Card -->
+            <div style="background: rgba(75, 85, 99, 0.2); border: 1.5px solid rgba(156, 163, 175, 0.35); border-radius: 8px; padding: 14px 16px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                <span style="font-size: 0.75rem; color: #E5E7EB; text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em;" data-i18n="admin_kpi_coal_trucks">⛏️ Coal Inward (कोळसा)</span>
+                <span id="raw-coal-today-tag" style="font-size: 0.7rem; background: rgba(75, 85, 99, 0.5); padding: 2px 6px; border-radius: 4px; color: #fff;">Today: 0</span>
+              </div>
+              <strong id="kpi-raw-coal-trucks" style="font-size: 1.7rem; color: #fff; font-family: var(--font-heading); display: block;">0</strong>
+              <span id="kpi-raw-coal-subtitle" style="font-size: 0.75rem; color: var(--color-text-dim);">0 Total Trucks (ट्रक्स)</span>
+            </div>
+          </div>
+
+          <!-- 3 Financial Khata Cards: Total Value, Paid, Remaining -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 16px;">
+            <div style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 8px; padding: 12px 14px;">
+              <span style="font-size: 0.7rem; color: #93C5FD; display: block; font-weight: 700; text-transform: uppercase;" data-i18n="admin_kpi_raw_total_val">Total Value (एकूण बिल)</span>
+              <strong id="kpi-raw-total-value" style="font-size: 1.25rem; color: #fff; font-family: var(--font-heading); display: block; margin-top: 4px;">₹0</strong>
+            </div>
+
+            <div style="background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3); border-radius: 8px; padding: 12px 14px;">
+              <span style="font-size: 0.7rem; color: #86EFAC; display: block; font-weight: 700; text-transform: uppercase;" data-i18n="admin_kpi_raw_paid">Amount Paid (दिलेली रक्कम)</span>
+              <strong id="kpi-raw-total-paid" style="font-size: 1.25rem; color: #4ADE80; font-family: var(--font-heading); display: block; margin-top: 4px;">₹0</strong>
+            </div>
+
+            <div style="background: rgba(239, 68, 68, 0.12); border: 1.5px solid rgba(239, 68, 68, 0.4); border-radius: 8px; padding: 12px 14px;">
+              <span style="font-size: 0.7rem; color: #FCA5A5; display: block; font-weight: 700; text-transform: uppercase;" data-i18n="admin_kpi_raw_due">Remaining Due (बाकी रक्कम)</span>
+              <strong id="kpi-raw-total-due" style="font-size: 1.25rem; color: #EF4444; font-family: var(--font-heading); display: block; margin-top: 4px;">₹0</strong>
+            </div>
+          </div>
+
+          <!-- Importers Quick Chips & Balance Directory -->
+          <div class="transporters-chip-section" style="margin-top: 8px;">
+            <div class="transporters-chip-header">
+              <span style="font-size: 0.78rem; font-weight: 700; color: var(--color-text-dim);">
+                🏭 Importers & Suppliers Directory (<span id="importers-count">0</span>) • <span style="color: #34D399; font-weight: 700;">☁️ Firebase Connected</span>
+              </span>
+              <span style="font-size: 0.72rem; color: var(--color-text-muted);">Outstanding balance summary</span>
+            </div>
+            <div class="transporters-chips-wrap" id="importers-chips-container">
+              <!-- Rendered importer tags with due balances -->
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Raw Materials Table Panel -->
+      <div class="table-panel" style="margin-top: 24px;">
+        <div class="table-toolbar">
+          <div>
+            <h2 class="panel-title" style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+              <span data-i18n="admin_raw_table_title">Raw Materials Inward & Payment Khata Register</span>
+              <span style="font-size: 0.72rem; color: #34D399; font-weight: 700; background: rgba(52, 211, 153, 0.12); padding: 2px 7px; border-radius: 8px; border: 1px solid rgba(52, 211, 153, 0.3);">☁️ Live in Firebase</span>
+            </h2>
+            <p style="font-size: 0.8rem; color: var(--color-text-dim); margin-top: 2px;" data-i18n="admin_raw_table_sub">Track every incoming truck of soil & coal with importer payment balances</p>
+          </div>
+
+          <div class="table-toolbar-actions">
+            <!-- Filter by material type -->
+            <div class="raw-filter-tabs" style="display: flex; gap: 4px; background: rgba(0,0,0,0.3); border: 1px solid var(--color-charcoal-border); border-radius: 6px; padding: 2px;">
+              <button type="button" class="btn-filter-raw active" data-filter="all" onclick="filterRawMaterials('all', this)" style="padding: 6px 12px; font-size: 0.78rem; border: none; background: transparent; color: #fff; cursor: pointer; border-radius: 4px;">All</button>
+              <button type="button" class="btn-filter-raw" data-filter="Soil" onclick="filterRawMaterials('Soil', this)" style="padding: 6px 12px; font-size: 0.78rem; border: none; background: transparent; color: var(--color-text-dim); cursor: pointer; border-radius: 4px;">🚜 Soil</button>
+              <button type="button" class="btn-filter-raw" data-filter="Coal" onclick="filterRawMaterials('Coal', this)" style="padding: 6px 12px; font-size: 0.78rem; border: none; background: transparent; color: var(--color-text-dim); cursor: pointer; border-radius: 4px;">⛏️ Coal</button>
+              <button type="button" class="btn-filter-raw" data-filter="due" onclick="filterRawMaterials('due', this)" style="padding: 6px 12px; font-size: 0.78rem; border: none; background: transparent; color: #EF4444; cursor: pointer; border-radius: 4px;">🔴 Due Only</button>
+            </div>
+
+            <div class="search-input-wrap">
+              <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+              <input type="text" id="raw-search-input" class="search-input" placeholder="Search importer, truck no...">
+            </div>
+
+            <button type="button" class="btn-admin btn-outline" onclick="exportRawMaterialsCSV()">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+              <span data-i18n="admin_raw_btn_export_csv">Export Khata CSV</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="table-wrap-admin">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th data-i18n="admin_raw_th_material">Material & Date</th>
+                <th data-i18n="admin_raw_th_trucks">Trucks & Vehicle</th>
+                <th data-i18n="admin_raw_th_importer">Importer / Supplier</th>
+                <th data-i18n="admin_raw_th_total">Total Value (₹)</th>
+                <th data-i18n="admin_raw_th_paid">Amount Paid (₹)</th>
+                <th data-i18n="admin_raw_th_remaining">Remaining Due (₹)</th>
+                <th style="text-align: right;" data-i18n="admin_raw_th_action">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="raw-materials-table-body">
+              <!-- Rendered dynamically by admin.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==========================================
+         SECTION 7: WEBSITE INQUIRIES & LEADS (FIRESTORE LIVE SYNC)
+         ========================================== -->
+    <div id="section-inquiries" class="admin-page-section">
+      <div class="table-panel">
+        <div class="table-toolbar">
+          <div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <h2 class="panel-title" data-i18n="admin_inq_title">Website Customer Inquiries</h2>
+              <span class="badge-count" style="background: rgba(16, 185, 129, 0.15); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.4); font-size: 0.72rem; font-weight: 800; padding: 2px 8px; border-radius: 12px;">Live Cloud Synced</span>
+            </div>
+            <p style="font-size: 0.8rem; color: var(--color-text-dim); margin-top: 2px;" data-i18n="admin_inq_sub">Direct quotes and purchase requests submitted by customers on Sukhakarta website</p>
+          </div>
+
+          <div class="table-toolbar-actions">
+            <div class="search-input-wrap">
+              <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+              <input type="text" id="inquiries-search-input" class="search-input" placeholder="Search customer, location or phone...">
+            </div>
+
+            <button type="button" class="btn-admin btn-outline" onclick="refreshInquiriesFromCloud()" title="Reload from Firestore">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+              <span>Refresh Inquiries</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="table-wrap-admin">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Customer Name</th>
+                <th>Phone / WhatsApp</th>
+                <th>Delivery Site</th>
+                <th>Bricks Quantity</th>
+                <th>Project Type</th>
+                <th>Date / Notes</th>
+                <th style="text-align: right;">Action</th>
+              </tr>
+            </thead>
+            <tbody id="inquiries-table-body">
+              <!-- Rendered dynamically by admin.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==========================================
+         SECTION 8: WEBSITE LIVE DATA & KILN SETTINGS
+         ========================================== -->
+    <div id="section-website-data" class="admin-page-section">
+      <div class="dash-panel">
+        <div class="panel-header">
+          <div>
+            <h2 class="panel-title" data-i18n="admin_web_title">Website Live Data & Kiln Status</h2>
+            <p class="panel-subtitle" data-i18n="admin_web_sub">Control live stock, wholesale pricing, and kiln operational status shown on the main website</p>
+          </div>
+          <span class="badge-count" style="background: rgba(16, 185, 129, 0.15); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.4); font-size: 0.72rem; font-weight: 800; padding: 4px 10px; border-radius: 12px;">Live Firestore Sync</span>
+        </div>
+
+        <form id="website-settings-form" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; margin-top: 15px;">
+          <div class="form-group-admin">
+            <label class="form-label-admin">Kiln Operational Status (English)</label>
+            <select id="web-kiln-status" class="form-control-admin">
+              <option value="Active Firing & Dispatching">Active Firing & Dispatching</option>
+              <option value="Full Fired Stock Ready for Dispatch">Full Fired Stock Ready for Dispatch</option>
+              <option value="Cooling & Quality Inspection">Cooling & Quality Inspection</option>
+              <option value="Monsoon Covered Storage Dispatch">Monsoon Covered Storage Dispatch</option>
+            </select>
+          </div>
+
+          <div class="form-group-admin">
+            <label class="form-label-admin">Kiln Status (मराठी)</label>
+            <input type="text" id="web-kiln-status-mr" class="form-control-admin" value="सक्रिय भट्टी भाजणे व जलद वाहतूक सुरू">
+          </div>
+
+          <div class="form-group-admin">
+            <label class="form-label-admin">Wholesale Rate per Brick (₹)</label>
+            <input type="number" id="web-rate-brick" class="form-control-admin" step="0.1" value="9.50" min="5" max="30">
+          </div>
+
+          <div class="form-group-admin">
+            <label class="form-label-admin">Rate per 1,000 Bricks (₹)</label>
+            <input type="number" id="web-rate-1000" class="form-control-admin" step="50" value="9500" min="5000">
+          </div>
+
+          <div class="form-group-admin">
+            <label class="form-label-admin">Yard Ready Stock (Bricks)</label>
+            <input type="number" id="web-stock-count" class="form-control-admin" value="42000">
+          </div>
+
+          <div class="form-group-admin">
+            <label class="form-label-admin">Daily Kiln Capacity (Bricks/Day)</label>
+            <input type="number" id="web-daily-capacity" class="form-control-admin" value="25000">
+          </div>
+
+          <div class="form-group-admin" style="grid-column: 1 / -1;">
+            <label class="form-label-admin">Website Live Notice / Announcement (English)</label>
+            <input type="text" id="web-notice" class="form-control-admin" value="Fresh kiln-burned batch ready for immediate site delivery across Pune & surrounding regions.">
+          </div>
+
+          <div class="form-group-admin" style="grid-column: 1 / -1;">
+            <label class="form-label-admin">Website Live Notice (मराठी)</label>
+            <input type="text" id="web-notice-mr" class="form-control-admin" value="पुणे व परिसरासाठी ताजी, पक्की भाजलेली लाल विटांची पहिली बॅच त्वरित डिलिव्हरीसाठी सज्ज.">
+          </div>
+
+          <div style="grid-column: 1 / -1; display: flex; gap: 12px; margin-top: 10px;">
+            <button type="submit" class="btn-admin btn-terracotta" style="padding: 10px 24px; font-weight: 700;">
+              <span>💾 Save & Publish Live to Website</span>
+            </button>
+            <button type="button" class="btn-admin btn-outline" onclick="loadWebsiteSettingsIntoAdmin()">
+              <span>🔄 Reset to Cloud Values</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+  </main>
+    </div> <!-- End of .admin-main-wrapper -->
+
+  <!-- ==========================================
+       ADD NEW WORKER MODAL
+       ========================================== -->
+  <div class="modal-overlay" id="worker-modal-overlay">
+    <div class="modal-card" style="max-width: 580px; width: 95%;">
+      <div class="modal-title">
+        <span id="worker-modal-title">👷 Add Worker to Roster</span>
+        <button type="button" class="modal-close" id="btn-close-worker-modal" onclick="closeWorkerModal()">&times;</button>
+      </div>
+
+      <form id="add-worker-form">
+        <input type="hidden" id="edit-worker-id" value="">
+        <div class="form-row-admin-2">
+          <div class="form-group-admin">
+            <label for="new-worker-name" class="form-label-admin">Worker Full Name (कामगाराचे नाव) *</label>
+            <input type="text" id="new-worker-name" class="form-control-admin" placeholder="e.g. Sahil Khot (साहिल खोत)" required>
+          </div>
+          <div class="form-group-admin">
+            <label for="new-worker-phone" class="form-label-admin">Mobile Number (मोबाईल क्र.)</label>
+            <input type="tel" id="new-worker-phone" class="form-control-admin" placeholder="e.g. 9823456710">
+          </div>
+        </div>
+
+        <div class="form-row-admin-2">
+          <div class="form-group-admin">
+            <label for="new-worker-role" class="form-label-admin">Role / Specialization (कामाचे पद)</label>
+            <select id="new-worker-role" class="form-control-admin">
+              <option value="Hand Molder">Hand Molder (हात साचा कारागीर)</option>
+              <option value="Master Molder">Master Molder (मुख्य कारागीर)</option>
+              <option value="Pug Press Operator">Pug Press Operator (प्रेस ऑपरेटर)</option>
+              <option value="Stacking & Drying">Stacking & Drying (विट रचणे व सुकवणे)</option>
+              <option value="Kiln Loading Master">Kiln Loading Master (भट्टी भराई कामगार)</option>
+              <option value="Clay Mixer / Preparation">Clay Mixer / Preparation (माती मळणे)</option>
+            </select>
+          </div>
+          <div class="form-group-admin">
+            <label for="new-worker-status" class="form-label-admin">Status (स्थिती)</label>
+            <select id="new-worker-status" class="form-control-admin">
+              <option value="Active">Active (सक्रिय कामगार)</option>
+              <option value="On Leave">On Leave (रजेवर)</option>
+              <option value="Inactive">Inactive (काम सोडलेले / निष्क्रिय)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row-admin-2">
+          <div class="form-group-admin">
+            <label for="new-worker-rate" class="form-label-admin">Rate per 1,000 Bricks (दर ₹)</label>
+            <input type="number" id="new-worker-rate" class="form-control-admin" value="1000" min="1" step="1" required>
+          </div>
+
+          <div class="form-group-admin">
+            <label for="new-worker-target" class="form-label-admin">Daily Target Bricks (दैनिक मर्यादा)</label>
+            <input type="number" id="new-worker-target" class="form-control-admin" value="1500" min="1" step="1" required>
+          </div>
+        </div>
+
+        <div class="form-row-admin-2">
+          <div class="form-group-admin">
+            <label for="new-worker-join-date" class="form-label-admin">Joining Date (कामावर रुजू तारीख)</label>
+            <input type="date" id="new-worker-join-date" class="form-control-admin">
+          </div>
+          <div class="form-group-admin">
+            <label for="new-worker-address" class="form-label-admin">Village / Address (गाव / पत्ता)</label>
+            <input type="text" id="new-worker-address" class="form-control-admin" placeholder="e.g. Chikhali, Kolhapur">
+          </div>
+        </div>
+
+        <div class="form-group-admin">
+          <label for="new-worker-notes" class="form-label-admin">Notes / Emergency Contact / Aadhaar (नोंद / आधार क्र.)</label>
+          <input type="text" id="new-worker-notes" class="form-control-admin" placeholder="e.g. Emergency Phone, Aadhaar No., Special skill notes">
+        </div>
+
+        <button type="submit" id="btn-save-worker" class="btn-admin btn-terracotta" style="width: 100%; justify-content: center; padding: 12px; margin-top: 10px;">
+          <span id="btn-save-worker-text">💾 Save Worker Details & Sync to Firebase</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       MARK WORKER LEAVE MODAL
+       ========================================== -->
+  <div class="modal-overlay" id="leave-modal-overlay">
+    <div class="modal-card">
+      <div class="modal-title">
+        <span data-i18n="admin_modal_leave_title">Mark Worker Leave</span>
+        <button type="button" class="modal-close" id="btn-close-leave-modal">&times;</button>
+      </div>
+
+      <form id="mark-leave-form">
+        <div class="form-group-admin">
+          <label for="leave-worker-select" class="form-label-admin" data-i18n="admin_modal_leave_worker">Worker</label>
+          <select id="leave-worker-select" class="form-control-admin" required>
+            <!-- Populated dynamically -->
+          </select>
+        </div>
+
+        <div class="form-row-admin-2">
+          <div class="form-group-admin">
+            <label for="leave-date" class="form-label-admin" data-i18n="admin_modal_leave_date">Leave Date</label>
+            <input type="date" id="leave-date" class="form-control-admin" required>
+          </div>
+
+          <div class="form-group-admin">
+            <label for="leave-reason" class="form-label-admin" data-i18n="admin_modal_leave_reason">Reason</label>
+            <select id="leave-reason" class="form-control-admin">
+              <option value="Personal / घरगुती">Personal / घरगुती</option>
+              <option value="Sick / आजारी">Sick / आजारी</option>
+              <option value="Festival / सण">Festival / सण</option>
+              <option value="Family Function / कार्य">Family Function / कार्य</option>
+              <option value="Other / इतर">Other / इतर</option>
+            </select>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-admin btn-terracotta" style="width: 100%; justify-content: center; padding: 12px; margin-top: 10px;">
+          <span data-i18n="admin_modal_leave_btn">Save Worker Leave</span>
+        </button>
+
+        <!-- Past Leaves for selected worker -->
+        <div id="worker-leave-history-section" style="margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--color-charcoal-border);">
+          <div style="font-size: 0.8rem; font-weight: 700; color: var(--color-text-dim); margin-bottom: 8px;" data-i18n="admin_leave_history_title">
+            Past Taken Leaves
+          </div>
+          <div id="worker-leave-history-list" style="max-height: 140px; overflow-y: auto;">
+            <!-- Rendered list of leaves with remove option -->
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  </div> <!-- End of #admin-dashboard-view -->
+
+  <!-- Quick Update Payment Modal for Importers -->
+  <div class="modal-overlay" id="raw-payment-modal-overlay">
+    <div class="modal-dialog-admin" style="max-width: 440px;">
+      <div class="modal-header-admin">
+        <h3 class="modal-title-admin" id="raw-payment-modal-title">💵 Update Importer Payment</h3>
+        <button type="button" class="btn-modal-close" onclick="closeRawPaymentModal()">&times;</button>
+      </div>
+      <form id="raw-payment-form" style="padding: 20px;">
+        <input type="hidden" id="raw-payment-entry-id">
+        
+        <div style="background: rgba(255,255,255,0.04); border: 1px solid var(--color-charcoal-border); border-radius: 8px; padding: 12px; margin-bottom: 16px;">
+          <div style="font-size: 0.88rem; color: #fff; font-weight: 700;" id="raw-payment-importer-display">--</div>
+          <div style="display: flex; justify-content: space-between; margin-top: 6px; font-size: 0.8rem; color: var(--color-text-dim);">
+            <span>Total Bill: <strong id="raw-payment-bill-display" style="color: #fff;">₹0</strong></span>
+            <span>Currently Paid: <strong id="raw-payment-paid-display" style="color: #4ade80;">₹0</strong></span>
+          </div>
+          <div style="margin-top: 6px; font-size: 0.9rem; color: #EF4444; font-weight: 800;">
+            Current Due (बाकी): <span id="raw-payment-due-display">₹0</span>
+          </div>
+        </div>
+
+        <div class="form-group-admin">
+          <label for="raw-payment-add-amount" class="form-label-admin">
+            <span>Enter New Additional Payment (₹) *</span>
+            <span style="font-size: 0.72rem; color: var(--color-text-dim);">(आता दिलेली रक्कम)</span>
+          </label>
+          <input type="number" id="raw-payment-add-amount" class="form-control-admin" placeholder="e.g. 5000" min="1" step="any" required>
+        </div>
+
+        <div class="form-group-admin">
+          <label for="raw-payment-date" class="form-label-admin">Payment Date</label>
+          <input type="date" id="raw-payment-date" class="form-control-admin" required>
+        </div>
+
+        <div class="form-group-admin">
+          <label for="raw-payment-note" class="form-label-admin">Payment Remarks / Mode (Cash / UPI / Cheque)</label>
+          <input type="text" id="raw-payment-note" class="form-control-admin" placeholder="e.g. Paid via UPI / GPay">
+        </div>
+
+        <button type="submit" class="btn-admin btn-terracotta" style="width: 100%; justify-content: center; padding: 12px;">
+          <span>Confirm Payment & Update Balance</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Add / Edit Raw Brick Traveler Worker -->
+  <div class="modal-overlay" id="raw-traveler-worker-modal" onclick="if(event.target===this)closeRawTravelerWorkerModal()">
+    <div class="modal-card">
+      <div class="modal-title">
+        <span id="raw-worker-modal-title" data-i18n="admin_modal_raw_worker_title">Add / Edit Raw Brick Traveler Worker</span>
+        <button type="button" class="modal-close" onclick="closeRawTravelerWorkerModal()">&times;</button>
+      </div>
+
+      <form id="raw-traveler-worker-form">
+        <input type="hidden" id="raw-worker-edit-id">
+
+        <div class="form-group-admin">
+          <label for="raw-worker-name" class="form-label-admin" data-i18n="admin_modal_raw_worker_name">Worker Full Name *</label>
+          <input type="text" id="raw-worker-name" class="form-control-admin" placeholder="e.g. Dattu Shinde / बाबुराव घाडगे" required>
+        </div>
+
+        <div class="form-row-admin-2">
+          <div class="form-group-admin">
+            <label for="raw-worker-vehicle-type" class="form-label-admin" data-i18n="admin_modal_raw_worker_vehicle">Primary Transport Mode *</label>
+            <select id="raw-worker-vehicle-type" class="form-control-admin" required>
+              <option value="Tractor Trolley">🚜 Tractor Trolley (ट्रॅक्टर ट्रॉली)</option>
+              <option value="Hand Cart">🛒 Hand Cart / Thela (हातगाडी / ठेला)</option>
+              <option value="Wheelbarrow">🛞 Wheelbarrow / Trolley (चाक गाडी)</option>
+              <option value="Head-Load">🧺 Head-Load / Basket (टोपली / डोक्यावरून)</option>
+              <option value="Animal Cart">🐴 Animal Cart (बैलगाडी / घोडागाडी)</option>
+            </select>
+          </div>
+
+          <div class="form-group-admin">
+            <label for="raw-worker-vehicle-no" class="form-label-admin" data-i18n="admin_modal_raw_worker_veh_no">Vehicle / Cart No. or ID</label>
+            <input type="text" id="raw-worker-vehicle-no" class="form-control-admin" placeholder="e.g. Trolley MH 12 5566 / Cart #2">
+          </div>
+        </div>
+
+        <div class="form-group-admin">
+          <label for="raw-worker-phone" class="form-label-admin" data-i18n="admin_modal_raw_worker_phone">Contact Phone Number</label>
+          <input type="tel" id="raw-worker-phone" class="form-control-admin" placeholder="e.g. 9876543210">
+          <input type="hidden" id="raw-worker-rate" value="250">
+        </div>
+
+        <button type="submit" class="btn-admin btn-terracotta" style="width: 100%; justify-content: center; padding: 12px; margin-top: 10px;">
+          <span data-i18n="admin_modal_raw_worker_btn_save">Save Traveler Worker Profile</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Edit Raw Bricks Kiln Inward Log Entry -->
+  <div class="modal-overlay" id="raw-traveler-edit-entry-modal" onclick="if(event.target===this)closeRawTravelerEditModal()">
+    <div class="modal-card">
+      <div class="modal-title">
+        <span>✏️ Edit Kiln Inward Entry</span>
+        <button type="button" class="modal-close" onclick="closeRawTravelerEditModal()">&times;</button>
+      </div>
+
+      <form id="raw-traveler-edit-entry-form">
+        <input type="hidden" id="edit-entry-id">
+
+        <div class="form-row-admin-2">
+          <div class="form-group-admin">
+            <label for="edit-entry-worker-select" class="form-label-admin">Traveler Worker *</label>
+            <select id="edit-entry-worker-select" class="form-control-admin" required></select>
+          </div>
+
+          <div class="form-group-admin">
+            <label for="edit-entry-transport-mode" class="form-label-admin">Transport Vehicle / Mode</label>
+            <select id="edit-entry-transport-mode" class="form-control-admin" required>
+              <option value="Tractor Trolley">🚜 Tractor Trolley (ट्रॅक्टर ट्रॉली)</option>
+              <option value="Hand Cart">🛒 Hand Cart / Thela (हातगाडी / ठेला)</option>
+              <option value="Wheelbarrow">🛞 Wheelbarrow / Trolley (चाक गाडी)</option>
+              <option value="Head-Load">🧺 Head-Load / Basket (टोपली / डोक्यावरून)</option>
+              <option value="Animal Cart">🐴 Animal Cart (बैलगाडी / घोडागाडी)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row-admin-2">
+          <div class="form-group-admin">
+            <label for="edit-entry-source-land" class="form-label-admin">
+              <span data-i18n="admin_raw_travelers_source_land">Brick Manufacturing Worker *</span>
+            </label>
+            <select id="edit-entry-source-land" class="form-control-admin" required></select>
+            <div id="edit-molder-available-stock-badge" style="display: none; margin-top: 6px; padding: 6px 10px; border-radius: 6px; font-size: 0.78rem; background: rgba(234, 88, 12, 0.1); border: 1px solid rgba(234, 88, 12, 0.35); color: #FED7AA;"></div>
+          </div>
+
+          <div class="form-group-admin">
+            <label for="edit-entry-dest-chamber" class="form-label-admin">Destination Kiln Chamber</label>
+            <input type="text" id="edit-entry-dest-chamber" class="form-control-admin" required>
+          </div>
+        </div>
+
+        <div class="form-row-admin-3" style="display: grid; grid-template-columns: 1fr 1fr 1.2fr; gap: 10px;">
+          <div class="form-group-admin">
+            <label for="edit-entry-trips" class="form-label-admin">Trips *</label>
+            <input type="number" id="edit-entry-trips" class="form-control-admin" min="1" step="1" required>
+          </div>
+
+          <div class="form-group-admin">
+            <label for="edit-entry-date" class="form-label-admin">Date *</label>
+            <input type="date" id="edit-entry-date" class="form-control-admin" required>
+          </div>
+
+          <div class="form-group-admin">
+            <label for="edit-entry-bricks-count" class="form-label-admin" style="color: #FB923C;">Bricks Reached *</label>
+            <input type="number" id="edit-entry-bricks-count" class="form-control-admin" min="1" step="1" required style="border-color: rgba(234, 88, 12, 0.5); font-weight: 700; color: #fff;">
+            <div id="edit-entry-bricks-limit-msg" style="display: none; margin-top: 4px; font-size: 0.75rem; color: #F87171; font-weight: 600;"></div>
+          </div>
+        </div>
+
+        <div class="form-group-admin">
+          <input type="hidden" id="edit-entry-rate">
+          <label for="edit-entry-notes" class="form-label-admin">Remarks / Notes</label>
+          <input type="text" id="edit-entry-notes" class="form-control-admin">
+        </div>
+
+        <button type="submit" class="btn-admin btn-terracotta" style="width: 100%; justify-content: center; padding: 12px; margin-top: 8px;">
+          <span>Update Kiln Inward Entry</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Firebase App & Firestore SDKs (Compat CDN v10) -->
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js?v=58"></script>
+  <script src="translations.js?v=58"></script>
+  <script src="admin.js?v=64"></script>
+</body>
+</html>

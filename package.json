@@ -1,0 +1,9 @@
+{
+  "name": "sukhakarta-bricks",
+  "version": "1.0.0",
+  "description": "Sukhakarta Bricks & Kiln Works - Website and Kiln Admin Dashboard",
+  "scripts": {
+    "start": "npx -y serve -l 3000 .",
+    "serve:py": "python -m http.server 3000 --bind 127.0.0.1"
+  }
+}
