@@ -53,7 +53,8 @@ function initHeader() {
   const header = document.querySelector('.site-header');
   const mobileToggle = document.querySelector('.mobile-toggle');
   const navMenu = document.querySelector('.nav-menu');
-  const navLinks = document.querySelectorAll('.nav-link');
+  const backdrop = document.getElementById('menu-backdrop');
+  const navLinks = document.querySelectorAll('.nav-link, .mobile-nav-cta a');
 
   // Sticky header scroll shadow
   window.addEventListener('scroll', () => {
@@ -62,27 +63,52 @@ function initHeader() {
     } else {
       header.classList.remove('is-scrolled');
     }
-  });
+  }, { passive: true });
+
+  function closeMenu() {
+    if (navMenu) navMenu.classList.remove('open');
+    if (backdrop) backdrop.classList.remove('active');
+    document.body.classList.remove('menu-open');
+    if (mobileToggle) {
+      mobileToggle.setAttribute('aria-expanded', 'false');
+      mobileToggle.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>`;
+    }
+  }
+
+  function openMenu() {
+    if (navMenu) navMenu.classList.add('open');
+    if (backdrop) backdrop.classList.add('active');
+    document.body.classList.add('menu-open');
+    if (mobileToggle) {
+      mobileToggle.setAttribute('aria-expanded', 'true');
+      mobileToggle.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
+    }
+  }
 
   // Mobile menu toggle
   if (mobileToggle && navMenu) {
-    mobileToggle.addEventListener('click', () => {
-      const isOpen = navMenu.classList.toggle('open');
-      mobileToggle.setAttribute('aria-expanded', isOpen);
-      mobileToggle.innerHTML = isOpen
-        ? `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`
-        : `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>`;
+    mobileToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = navMenu.classList.contains('open');
+      if (isOpen) {
+        closeMenu();
+      } else {
+        openMenu();
+      }
+    });
+
+    if (backdrop) {
+      backdrop.addEventListener('click', closeMenu);
+    }
+
+    // Close on escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeMenu();
     });
 
     // Close menu when clicking any nav link
     navLinks.forEach(link => {
-      link.addEventListener('click', () => {
-        navMenu.classList.remove('open');
-        if (mobileToggle) {
-          mobileToggle.setAttribute('aria-expanded', 'false');
-          mobileToggle.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>`;
-        }
-      });
+      link.addEventListener('click', closeMenu);
     });
   }
 }
@@ -408,8 +434,12 @@ function initInquiryForm() {
         }
       }
 
-      // Open WhatsApp
-      window.open(targetUrl, '_blank');
+      // Open WhatsApp directly without popup blocker on mobile
+      if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+        window.location.href = targetUrl;
+      } else {
+        window.open(targetUrl, '_blank');
+      }
       showToast(isMarathi ? '✅ नोंद डेटाबेसमध्ये सेव्ह झाली! व्हॉट्सॲप उघडत आहे...' : '✅ Inquiry saved to kiln database! Opening WhatsApp...');
       form.reset();
     });
