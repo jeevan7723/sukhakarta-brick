@@ -49,6 +49,12 @@
   padding: 0;
 }
 
+html {
+  max-width: 100%;
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+}
+
 body {
   font-family: var(--font-body);
   background-color: var(--color-charcoal-dark);
@@ -57,6 +63,9 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  max-width: 100%;
+  overflow-x: hidden;
+  position: relative;
 }
 
 a {
@@ -75,16 +84,21 @@ button, input, select, textarea {
   display: flex;
   min-height: 100vh;
   width: 100%;
+  max-width: 100%;
   background-color: var(--color-charcoal-dark);
   position: relative;
+  overflow-x: hidden;
 }
 
 .admin-main-wrapper {
   flex: 1;
   min-width: 0;
+  max-width: 100%;
+  width: 100%;
   display: flex;
   flex-direction: column;
   background-color: var(--color-charcoal-dark);
+  overflow-x: hidden;
 }
 
 /* Sidebar Backdrop for Mobile */
@@ -1938,6 +1952,7 @@ button, input, select, textarea {
 }
 
 /* Responsive */
+/* Responsive Breakpoints & Mobile Optimization */
 @media (max-width: 1024px) {
   .admin-sidebar {
     position: fixed;
@@ -1954,8 +1969,71 @@ button, input, select, textarea {
   .sidebar-close-btn {
     display: inline-flex;
   }
+  .admin-navbar {
+    padding: 10px 14px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  .navbar-left {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+    width: 100%;
+    min-width: 0;
+  }
+  .brand-section {
+    gap: 10px;
+    min-width: 0;
+  }
+  .brand-info {
+    min-width: 0;
+  }
+  .brand-info p {
+    display: none;
+  }
+  .brand-info h1 {
+    font-size: 1.05rem;
+    white-space: nowrap;
+  }
+  .nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px;
+    scrollbar-width: thin;
+  }
+  .nav-actions::-webkit-scrollbar {
+    height: 3px;
+  }
+  .nav-actions::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+  }
+  .nav-actions .btn-admin,
+  .nav-actions .date-selector-wrap,
+  .nav-actions .cloud-sync-badge,
+  .nav-actions .lang-toggle-group {
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+  .admin-container {
+    padding: 16px 12px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
   .kpi-grid {
     grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
   }
   .dashboard-grid-2 {
     grid-template-columns: 1fr;
@@ -1964,20 +2042,29 @@ button, input, select, textarea {
 
 @media (max-width: 640px) {
   .admin-navbar {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
-    padding: 12px 16px;
-  }
-  .nav-actions {
-    width: 100%;
-    justify-content: space-between;
+    padding: 10px 12px;
   }
   .kpi-grid {
     grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .kpi-card {
+    padding: 16px;
+  }
+  .form-row-admin-2 {
+    grid-template-columns: 1fr;
   }
   .stages-summary-row {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr 1fr;
+  }
+  .delivery-metrics-grid {
+    grid-template-columns: 1fr;
+  }
+  .admin-page-header-bar {
+    padding: 12px 14px;
+  }
+  .page-header-title {
+    font-size: 1.25rem;
   }
 }
 
