@@ -2839,3 +2839,540 @@ ul {
     font-size: 0.72rem;
   }
 }
+
+/* ==========================================================================
+   SITE THEME SWITCHER (DARK MODE SYSTEM FOR LANDING PAGE)
+   ========================================================================== */
+
+/* Theme Toggle Button in Header */
+.theme-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: var(--color-sand-light);
+  border: 1.5px solid var(--color-sand-border);
+  color: var(--color-charcoal);
+  font-size: 1.05rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
+  box-sizing: border-box;
+  padding: 0;
+  user-select: none;
+}
+
+.theme-toggle-btn:hover {
+  border-color: var(--color-terracotta);
+  color: var(--color-terracotta);
+  background-color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(184, 69, 40, 0.15);
+}
+
+/* Icon visibility for site: Light is default */
+:root:not([data-theme="dark"]) .theme-icon-sun,
+[data-theme="light"] .theme-icon-sun {
+  display: none !important;
+}
+:root:not([data-theme="dark"]) .theme-icon-moon,
+[data-theme="light"] .theme-icon-moon {
+  display: inline-block !important;
+}
+
+[data-theme="dark"] .theme-icon-moon {
+  display: none !important;
+}
+[data-theme="dark"] .theme-icon-sun {
+  display: inline-block !important;
+}
+
+/* ==========================================================================
+   DARK THEME PALETTE & COMPONENT OVERRIDES
+   ========================================================================== */
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  /* Global Dark Mode Surfaces */
+  --site-bg-dark: #111114;
+  --site-card-dark: #19191F;
+  --site-card-subtle: #22222B;
+  --site-border-dark: #2B2B36;
+  --site-text-dark: #F3F4F6;
+  --site-text-muted: #9CA3AF;
+}
+
+[data-theme="dark"] body {
+  background-color: #111114 !important;
+  color: #E2E8F0 !important;
+}
+
+/* Header & Navigation in Dark Mode */
+[data-theme="dark"] .site-header {
+  background-color: rgba(17, 17, 20, 0.96) !important;
+  border-bottom-color: #272732 !important;
+}
+
+[data-theme="dark"] .site-header.is-scrolled {
+  background-color: #111114 !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5) !important;
+}
+
+[data-theme="dark"] .brand-name {
+  color: #FFFFFF !important;
+}
+
+[data-theme="dark"] .nav-link {
+  color: #CBD5E1 !important;
+}
+
+[data-theme="dark"] .nav-link:hover,
+[data-theme="dark"] .nav-link.active {
+  color: var(--color-terracotta-light) !important;
+}
+
+[data-theme="dark"] .nav-menu {
+  background-color: #19191F !important;
+  border-left-color: #2B2B36 !important;
+}
+
+[data-theme="dark"] .btn-header-call {
+  background-color: #22222B !important;
+  border-color: #383848 !important;
+  color: #E2E8F0 !important;
+}
+
+[data-theme="dark"] .btn-header-call:hover {
+  background-color: #2C2C38 !important;
+  border-color: var(--color-terracotta) !important;
+  color: var(--color-terracotta-light) !important;
+}
+
+[data-theme="dark"] .theme-toggle-btn {
+  background-color: #22222B !important;
+  border-color: #383848 !important;
+  color: #E2E8F0 !important;
+}
+
+[data-theme="dark"] .theme-toggle-btn:hover {
+  background-color: #2C2C38 !important;
+  border-color: var(--color-terracotta) !important;
+  color: #FBBF24 !important;
+}
+
+[data-theme="dark"] .lang-toggle-group {
+  background-color: #22222B !important;
+  border-color: #383848 !important;
+}
+
+[data-theme="dark"] .lang-btn {
+  color: #9CA3AF !important;
+}
+
+[data-theme="dark"] .lang-btn.active {
+  background-color: var(--color-terracotta) !important;
+  color: #FFFFFF !important;
+}
+
+[data-theme="dark"] .mobile-toggle {
+  color: #E2E8F0 !important;
+}
+
+[data-theme="dark"] .mobile-toggle:hover,
+[data-theme="dark"] .mobile-toggle:active {
+  background-color: #22222B !important;
+}
+
+[data-theme="dark"] .btn-header-call-mobile {
+  background-color: #22222B !important;
+  border-color: #383848 !important;
+  color: #E2E8F0 !important;
+}
+
+/* Hero Section */
+[data-theme="dark"] .hero-section {
+  background: linear-gradient(180deg, #181820 0%, #111114 100%) !important;
+  border-bottom-color: #272732 !important;
+}
+
+[data-theme="dark"] .hero-title {
+  color: #FFFFFF !important;
+}
+
+[data-theme="dark"] .hero-lead {
+  color: #CBD5E1 !important;
+}
+
+/* Sections */
+[data-theme="dark"] .section-white {
+  background-color: #15151A !important;
+}
+
+[data-theme="dark"] .section-sand {
+  background-color: #111114 !important;
+}
+
+[data-theme="dark"] .section-title {
+  color: #FFFFFF !important;
+}
+
+[data-theme="dark"] .section-description {
+  color: #9CA3AF !important;
+}
+
+/* Highlights Bar */
+[data-theme="dark"] .highlights-bar {
+  background-color: #0E0E12 !important;
+  border-top-color: var(--color-terracotta) !important;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.7) !important;
+}
+
+[data-theme="dark"] .highlight-content h4 {
+  color: #FFFFFF !important;
+}
+
+[data-theme="dark"] .highlight-content p {
+  color: #9CA3AF !important;
+}
+
+[data-theme="dark"] .highlight-icon-box {
+  background-color: #1B1B22 !important;
+  border-color: #2B2B36 !important;
+  color: #F59E0B !important;
+}
+
+/* Product & Spec Cards */
+[data-theme="dark"] .product-card-frame {
+  background-color: #19191F !important;
+  border-color: #2B2B36 !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
+}
+
+[data-theme="dark"] .quality-mini-card {
+  background-color: #19191F !important;
+  border-color: #2B2B36 !important;
+}
+
+[data-theme="dark"] .quality-mini-card h5 {
+  color: #FFFFFF !important;
+}
+
+[data-theme="dark"] .quality-mini-card p {
+  color: #9CA3AF !important;
+}
+
+[data-theme="dark"] .specs-panel {
+  background-color: #19191F !important;
+  border-color: #2B2B36 !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
+}
+
+[data-theme="dark"] .spec-table-wrap {
+  background-color: #19191F !important;
+  border-color: #2B2B36 !important;
+}
+
+[data-theme="dark"] .spec-table th {
+  background-color: #202028 !important;
+  color: #94A3B8 !important;
+  border-bottom-color: #2B2B36 !important;
+}
+
+[data-theme="dark"] .spec-table td {
+  background-color: #19191F !important;
+  color: #F1F5F9 !important;
+  border-bottom-color: #2B2B36 !important;
+}
+
+[data-theme="dark"] .spec-table td small {
+  color: #94A3B8 !important;
+}
+
+[data-theme="dark"] .spec-table tr:hover th,
+[data-theme="dark"] .spec-table tr:hover td {
+  background-color: rgba(255, 255, 255, 0.04) !important;
+}
+
+[data-theme="dark"] .spec-table td strong {
+  color: var(--color-terracotta-light) !important;
+}
+
+[data-theme="dark"] .applications-box {
+  background-color: #22222B !important;
+  border-color: #323240 !important;
+}
+
+[data-theme="dark"] .applications-box h4 {
+  color: #FFFFFF !important;
+}
+
+[data-theme="dark"] .app-pill {
+  background-color: #2B2B36 !important;
+  border-color: #3C3C4C !important;
+  color: #E2E8F0 !important;
+}
+
+/* Manufacturing & Process Section */
+[data-theme="dark"] .section-dark {
+  background-color: #0E0E12 !important;
+  color: #E2E8F0 !important;
+}
+
+[data-theme="dark"] .process-card {
+  background-color: #181820 !important;
+  border: 1px solid #2B2B38 !important;
+}
+
+[data-theme="dark"] .process-card .step-title {
+  color: #FFFFFF !important;
+}
+
+[data-theme="dark"] .process-card .step-desc {
+  color: #CBD5E1 !important;
+}
+
+[data-theme="dark"] .process-card .step-key-metric {
+  background-color: #20202A !important;
+  border-color: #323242 !important;
+  color: #FBBF24 !important;
+}
+
+[data-theme="dark"] .step-num-badge {
+  background: rgba(184, 69, 40, 0.25) !important;
+  color: #FF8F70 !important;
+}
+
+[data-theme="dark"] .step-icon-wrap {
+  background-color: #242430 !important;
+  color: var(--color-terracotta-light) !important;
+}
+
+/* Comparison Box */
+[data-theme="dark"] .comparison-box {
+  background-color: #181820 !important;
+  border-color: #2B2B38 !important;
+}
+
+[data-theme="dark"] .comparison-box h4 {
+  color: #FFFFFF !important;
+}
+
+[data-theme="dark"] .comp-col {
+  background-color: #20202A !important;
+  border-color: #30303E !important;
+}
+
+[data-theme="dark"] .comp-col h5 {
+  color: #FFFFFF !important;
+}
+
+[data-theme="dark"] .comp-col ul li {
+  color: #CBD5E1 !important;
+}
+
+[data-theme="dark"] .comp-col.highlight-col {
+  background: rgba(184, 69, 40, 0.16) !important;
+  border-color: var(--color-terracotta) !important;
+}
+
+[data-theme="dark"] .comp-col.highlight-col h5 {
+  color: #FF9E80 !important;
+}
+
+[data-theme="dark"] .comp-col.highlight-col ul li {
+  color: #F4EFEB !important;
+}
+
+/* Fleet Delivery Cards */
+[data-theme="dark"] .fleet-card {
+  background-color: #19191F !important;
+  border-color: #2B2B36 !important;
+}
+
+[data-theme="dark"] .fleet-title {
+  color: #FFFFFF !important;
+}
+
+[data-theme="dark"] .fleet-desc {
+  color: #9CA3AF !important;
+}
+
+[data-theme="dark"] .fleet-specs-list {
+  border-top-color: #2B2B36 !important;
+}
+
+[data-theme="dark"] .fleet-specs-list li {
+  color: #CBD5E1 !important;
+}
+
+[data-theme="dark"] .btn-outline-dark {
+  border-color: #94A3B8 !important;
+  color: #E2E8F0 !important;
+}
+
+[data-theme="dark"] .btn-outline-dark:hover {
+  background-color: #E2E8F0 !important;
+  color: #111114 !important;
+}
+
+[data-theme="dark"] .guarantee-strip {
+  background-color: #1B1B24 !important;
+  border-color: #2E2E3C !important;
+}
+
+[data-theme="dark"] .guarantee-text h4 {
+  color: #FFFFFF !important;
+}
+
+[data-theme="dark"] .guarantee-text p {
+  color: #9CA3AF !important;
+}
+
+/* Testimonial Cards */
+[data-theme="dark"] .testimonial-card {
+  background-color: #19191F !important;
+  border-color: #2B2B36 !important;
+}
+
+[data-theme="dark"] .testimonial-card p {
+  color: #CBD5E1 !important;
+}
+
+[data-theme="dark"] .author-info strong {
+  color: #FFFFFF !important;
+}
+
+[data-theme="dark"] .author-info span {
+  color: #9CA3AF !important;
+}
+
+/* Contact / Inquiry Section */
+[data-theme="dark"] .contact-info-panel {
+  background-color: #181820 !important;
+  border-color: #2B2B38 !important;
+}
+
+[data-theme="dark"] .contact-info-panel h3 {
+  color: #FFFFFF !important;
+}
+
+[data-theme="dark"] .contact-info-panel p {
+  color: #CBD5E1 !important;
+}
+
+[data-theme="dark"] .point-details strong {
+  color: #FFFFFF !important;
+}
+
+[data-theme="dark"] .point-details span,
+[data-theme="dark"] .point-details a {
+  color: #CBD5E1 !important;
+}
+
+[data-theme="dark"] .point-icon-box {
+  background-color: #22222B !important;
+  border-color: #323242 !important;
+  color: var(--color-terracotta-light) !important;
+}
+
+[data-theme="dark"] .inquiry-form-card {
+  background-color: #19191F !important;
+  border-color: #2B2B36 !important;
+}
+
+[data-theme="dark"] .inquiry-form-card h3 {
+  color: #FFFFFF !important;
+}
+
+[data-theme="dark"] .inquiry-form-card p {
+  color: #9CA3AF !important;
+}
+
+[data-theme="dark"] .form-label {
+  color: #E2E8F0 !important;
+}
+
+[data-theme="dark"] .label-hint {
+  color: #9CA3AF !important;
+}
+
+[data-theme="dark"] .form-control,
+[data-theme="dark"] .form-select {
+  background-color: #22222B !important;
+  border-color: #38384A !important;
+  color: #FFFFFF !important;
+}
+
+[data-theme="dark"] .form-control:focus,
+[data-theme="dark"] .form-select:focus {
+  border-color: var(--color-terracotta) !important;
+  box-shadow: 0 0 0 3px rgba(184, 69, 40, 0.3) !important;
+}
+
+[data-theme="dark"] .qty-chip {
+  background-color: #22222B !important;
+  border-color: #38384A !important;
+  color: #E2E8F0 !important;
+}
+
+[data-theme="dark"] .qty-chip:hover {
+  border-color: var(--color-terracotta) !important;
+}
+
+[data-theme="dark"] .qty-chip.active {
+  background-color: var(--color-terracotta) !important;
+  border-color: var(--color-terracotta) !important;
+  color: #FFFFFF !important;
+}
+
+/* FAQ Items */
+[data-theme="dark"] .faq-item {
+  background-color: #19191F !important;
+  border-color: #2B2B36 !important;
+}
+
+[data-theme="dark"] .faq-question {
+  color: #FFFFFF !important;
+}
+
+[data-theme="dark"] .faq-answer {
+  color: #CBD5E1 !important;
+}
+
+[data-theme="dark"] .faq-answer p {
+  color: #CBD5E1 !important;
+}
+
+/* Footer in Dark Mode */
+[data-theme="dark"] .site-footer {
+  background-color: #0A0A0D !important;
+  border-top-color: #1E1E26 !important;
+}
+
+/* Mobile Responsive Header Refinement (<= 480px) */
+@media (max-width: 480px) {
+  .header-actions {
+    gap: 6px !important;
+  }
+  .header-lang-switcher .lang-icon {
+    display: none !important;
+  }
+  .header-lang-switcher {
+    padding: 2px 4px !important;
+  }
+  .header-lang-switcher .lang-btn {
+    padding: 2px 6px !important;
+    font-size: 0.72rem !important;
+  }
+  .theme-toggle-btn.header-theme-toggle {
+    width: 34px !important;
+    height: 34px !important;
+    font-size: 0.95rem !important;
+  }
+  .mobile-toggle {
+    width: 34px !important;
+    height: 34px !important;
+  }
+}

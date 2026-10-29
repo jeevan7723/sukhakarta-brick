@@ -15,6 +15,7 @@ const SITE_CONFIG = {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
+  initSiteTheme();
   initLanguageSwitcher();
   initHeader();
   initCalculator();
@@ -640,3 +641,33 @@ function escapeHtml(str) {
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
 }
+
+// ==========================================
+// THEME SWITCHER (LIGHT / DARK FOR SITE)
+// ==========================================
+function initSiteTheme() {
+  const saved = localStorage.getItem('sukhakarta_site_theme') || 'light';
+  applySiteTheme(saved);
+}
+
+function applySiteTheme(theme) {
+  if (theme === 'dark') {
+    document.documentElement.setAttribute('data-theme', 'dark');
+  } else {
+    document.documentElement.setAttribute('data-theme', 'light');
+  }
+  localStorage.setItem('sukhakarta_site_theme', theme);
+}
+
+function toggleSiteTheme() {
+  const current = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+  const target = current === 'dark' ? 'light' : 'dark';
+  applySiteTheme(target);
+
+  if (typeof showToast === 'function') {
+    const isMr = typeof currentLang !== 'undefined' && currentLang === 'mr';
+    showToast(target === 'dark' ? (isMr ? '🌙 डार्क मोड चालू केला' : '🌙 Switched to Dark Mode') : (isMr ? '☀️ लाइट मोड चालू केला' : '☀️ Switched to Light Mode'));
+  }
+}
+
+window.toggleSiteTheme = toggleSiteTheme;

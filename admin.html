@@ -11,7 +11,16 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700;800&family=Outfit:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="admin.css?v=65">
+    <!-- FOUC prevention for Theme -->
+  <script>
+    (function() {
+      try {
+        var t = localStorage.getItem('sukhakarta_admin_theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', t);
+      } catch(e) {}
+    })();
+  </script>
+  <link rel="stylesheet" href="admin.css?v=70">
   <!-- html2pdf.js for client-side PDF document generation (local bundle + CDN fallback) -->
   <script src="assets/html2pdf.bundle.min.js?v=4.0"></script>
   <script>if (typeof html2pdf === 'undefined') document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"><\/script>');</script>
@@ -24,7 +33,13 @@
   <div id="admin-login-view" class="admin-login-overlay">
     <div class="login-card">
       <!-- Language Switcher in Login Card -->
-      <div style="display: flex; justify-content: flex-end; margin-bottom: 8px;">
+            <!-- Language & Theme Switchers in Login Card -->
+      <div style="display: flex; justify-content: flex-end; align-items: center; gap: 8px; margin-bottom: 8px;">
+        <button type="button" class="theme-toggle-btn" onclick="toggleTheme()" aria-label="Toggle Theme" title="Switch Light / Dark Theme" style="padding: 4px 10px; height: 32px; font-size: 0.75rem;">
+          <span class="theme-icon-sun">☀️</span>
+          <span class="theme-icon-moon">🌙</span>
+          <span class="theme-btn-label" data-i18n="admin_theme_btn">Light</span>
+        </button>
         <div class="lang-toggle-group" role="group" aria-label="Language Selector">
           <button type="button" class="lang-btn active" data-lang="en">EN</button>
           <button type="button" class="lang-btn" data-lang="mr">मराठी</button>
@@ -216,6 +231,11 @@
 
       <!-- Sidebar Bottom System Section -->
       <div class="sidebar-footer">
+                <button type="button" class="sidebar-footer-link btn-sidebar-theme" onclick="toggleTheme()" style="background: none; border: none; cursor: pointer; width: 100%; text-align: left;">
+          <span class="theme-icon-sun">☀️</span>
+          <span class="theme-icon-moon">🌙</span>
+          <span class="theme-btn-label" data-i18n="admin_theme_btn">Light</span>
+        </button>
         <a href="index.html" class="sidebar-footer-link">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
           <span data-i18n="admin_nav_view_site">View Website</span>
@@ -262,6 +282,13 @@
           <button type="button" class="btn-admin btn-outline" style="padding: 7px 12px; font-size: 0.8rem; gap: 6px; border-radius: var(--radius-sm);" onclick="pullAllFromCloud()" title="Download & sync latest data from Cloud Firestore">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
             <span data-i18n="admin_btn_cloud_pull">Cloud Refresh</span>
+          </button>
+
+                    <!-- Theme Switcher in Navbar (Dark / Light) -->
+          <button type="button" class="theme-toggle-btn" id="theme-toggle-btn" onclick="toggleTheme()" aria-label="Toggle Theme" title="Switch Light / Dark Theme">
+            <span class="theme-icon-sun">☀️</span>
+            <span class="theme-icon-moon">🌙</span>
+            <span class="theme-btn-label" data-i18n="admin_theme_btn">Light</span>
           </button>
 
           <!-- Language Switcher in Navbar -->

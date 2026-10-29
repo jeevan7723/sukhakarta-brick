@@ -209,6 +209,7 @@ function initAdminAuth() {
 document.addEventListener('DOMContentLoaded', () => {
   initAdminAuth();
   initAdminLanguage();
+  if (window.initAdminTheme) window.initAdminTheme();
 
   const dateInput = document.getElementById('filter-date');
   if (dateInput) {
@@ -5882,4 +5883,50 @@ window.exportRawTravelersPDF = function() {
   } else {
     openPrintWindowFallback(reportHtml);
   }
+};
+
+// ==========================================
+// THEME SWITCHER (DARK / LIGHT MODE)
+// ==========================================
+window.initAdminTheme = function() {
+  const saved = localStorage.getItem('sukhakarta_admin_theme') || 'dark';
+  window.applyTheme(saved);
+};
+
+window.applyTheme = function(theme) {
+  if (theme === 'light') {
+    document.documentElement.setAttribute('data-theme', 'light');
+  } else {
+    document.documentElement.setAttribute('data-theme', 'dark');
+  }
+  localStorage.setItem('sukhakarta_admin_theme', theme);
+  window.updateThemeLabels(theme);
+};
+
+window.toggleTheme = function() {
+  const current = document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+  const target = current === 'dark' ? 'light' : 'dark';
+  window.applyTheme(target);
+
+  const isMr = typeof currentLang !== 'undefined' && currentLang === 'mr';
+  const dict = typeof TRANSLATIONS !== 'undefined' ? (isMr ? TRANSLATIONS.mr : TRANSLATIONS.en) : null;
+  const msg = target === 'light'
+    ? (dict?.admin_theme_switched_light || (isMr ? '☀️ लाइट मोड चालू केला' : '☀️ Switched to Light Mode'))
+    : (dict?.admin_theme_switched_dark || (isMr ? '🌙 डार्क मोड चालू केला' : '🌙 Switched to Dark Mode'));
+
+  if (typeof showAdminToast === 'function') {
+    showAdminToast(msg);
+  }
+};
+
+window.updateThemeLabels = function(theme) {
+  const isMr = typeof currentLang !== 'undefined' && currentLang === 'mr';
+  const dict = typeof TRANSLATIONS !== 'undefined' ? (isMr ? TRANSLATIONS.mr : TRANSLATIONS.en) : null;
+  const label = theme === 'light'
+    ? (dict?.admin_theme_label_dark || (isMr ? 'डार्क' : 'Dark'))
+    : (dict?.admin_theme_label_light || (isMr ? 'लाइट' : 'Light'));
+
+  document.querySelectorAll('.theme-btn-label').forEach(el => {
+    el.textContent = label;
+  });
 };
